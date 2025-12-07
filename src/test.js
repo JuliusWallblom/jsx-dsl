@@ -18,6 +18,15 @@ function test(name, fn) {
   }
 }
 
+// Callback tokenization
+test('tokenizes ^ as CALLBACK token', () => {
+  const tokens = tokenize('^handler');
+
+  assert.strictEqual(tokens[0].type, 'CALLBACK');
+  assert.strictEqual(tokens[1].type, 'IDENTIFIER');
+  assert.strictEqual(tokens[1].value, 'handler');
+});
+
 // Context tokenization
 test('tokenizes & as CONTEXT token', () => {
   const tokens = tokenize('&theme');

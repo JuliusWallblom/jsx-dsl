@@ -15,6 +15,9 @@ export const TOKEN_TYPES = {
   // Context
   CONTEXT: 'CONTEXT',       // & for useContext
 
+  // Callback
+  CALLBACK: 'CALLBACK',     // ^ for useCallback
+
   // Operators
   ASSIGN: 'ASSIGN',         // =
   PLUS: 'PLUS',             // +
@@ -138,6 +141,12 @@ export function tokenize(input) {
     if (char === '&') {
       advance();
       addToken(TOKEN_TYPES.CONTEXT);
+      continue;
+    }
+
+    if (char === '^') {
+      advance();
+      addToken(TOKEN_TYPES.CALLBACK);
       continue;
     }
 
