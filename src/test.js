@@ -18,6 +18,15 @@ function test(name, fn) {
   }
 }
 
+// Handle tokenization
+test('tokenizes ~ as HANDLE token', () => {
+  const tokens = tokenize('~focus');
+
+  assert.strictEqual(tokens[0].type, 'HANDLE');
+  assert.strictEqual(tokens[1].type, 'IDENTIFIER');
+  assert.strictEqual(tokens[1].value, 'focus');
+});
+
 // Callback tokenization
 test('tokenizes ^ as CALLBACK token', () => {
   const tokens = tokenize('^handler');
