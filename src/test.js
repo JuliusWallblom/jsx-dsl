@@ -18,6 +18,23 @@ function test(name, fn) {
   }
 }
 
+// Layout effect tokenization
+test('tokenizes $$ as LAYOUT_EFFECT token', () => {
+  const tokens = tokenize('$$measure(el)');
+
+  assert.strictEqual(tokens[0].type, 'LAYOUT_EFFECT');
+  assert.strictEqual(tokens[1].type, 'IDENTIFIER');
+  assert.strictEqual(tokens[1].value, 'measure');
+});
+
+test('tokenizes single $ as EFFECT token (not LAYOUT_EFFECT)', () => {
+  const tokens = tokenize('$log(x)');
+
+  assert.strictEqual(tokens[0].type, 'EFFECT');
+  assert.strictEqual(tokens[1].type, 'IDENTIFIER');
+  assert.strictEqual(tokens[1].value, 'log');
+});
+
 // Handle tokenization
 test('tokenizes ~ as HANDLE token', () => {
   const tokens = tokenize('~focus');
