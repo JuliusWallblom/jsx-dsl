@@ -9,6 +9,7 @@ export function parse(tokens) {
     props: [],
     states: [],
     reducers: [],
+    contexts: [],
     effects: [],
     memos: [],
     events: {},
@@ -189,6 +190,14 @@ export function parse(tokens) {
     consume(TOKEN_TYPES.ASSIGN);
     const handler = parseExpression();
     ast.events[name] = handler;
+  };
+
+  // Parse context consumption: &contextName or &contextName::Type
+  const parseContext = () => {
+    consume(TOKEN_TYPES.CONTEXT);
+    const name = consume(TOKEN_TYPES.IDENTIFIER, 'Expected context name').value;
+    const typeAnnotation = parseTypeAnnotation();
+    ast.contexts.push({ name, type: typeAnnotation });
   };
 
   // Parse expressions (simplified for now)
@@ -467,6 +476,9 @@ export function parse(tokens) {
         break;
       case TOKEN_TYPES.EVENT:
         parseEvent();
+        break;
+      case TOKEN_TYPES.CONTEXT:
+        parseContext();
         break;
       case TOKEN_TYPES.LT:
         ast.jsx = parseJSX();

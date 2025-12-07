@@ -27,6 +27,26 @@ test('tokenizes & as CONTEXT token', () => {
   assert.strictEqual(tokens[1].value, 'theme');
 });
 
+// Context parsing
+test('parses &contextName as context consumption', () => {
+  const tokens = tokenize('&theme');
+  const ast = parse(tokens);
+
+  assert.strictEqual(ast.contexts.length, 1);
+  assert.strictEqual(ast.contexts[0].name, 'theme');
+  assert.strictEqual(ast.contexts[0].type, null);
+});
+
+test('parses &contextName::Type with type annotation', () => {
+  const tokens = tokenize('&theme::ThemeType');
+  const ast = parse(tokens);
+
+  assert.strictEqual(ast.contexts.length, 1);
+  assert.strictEqual(ast.contexts[0].name, 'theme');
+  assert.strictEqual(ast.contexts[0].type.type, 'SimpleType');
+  assert.strictEqual(ast.contexts[0].type.name, 'ThemeType');
+});
+
 // Arrow function parsing
 test('parses arrow function expression: s => s + 1', () => {
   const result = parseExpr('s => s + 1');
