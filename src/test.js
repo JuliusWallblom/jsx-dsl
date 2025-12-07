@@ -387,6 +387,17 @@ test('parses *name as id declaration', () => {
   assert.strictEqual(ast.ids[0].name, 'formId');
 });
 
+// Code generation for useId
+test('generates useId hook for id declarations', () => {
+  const code = compile(`
+*formId
+<div>content</div>
+`);
+
+  assert.ok(code.includes('useId'), 'should import useId');
+  assert.ok(code.includes('const formId = useId()'), 'should generate useId call');
+});
+
 // Summary
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);
