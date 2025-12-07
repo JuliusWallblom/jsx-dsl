@@ -1,6 +1,7 @@
 import { TOKEN_TYPES } from './tokenizer-ts.js';
 
 const MODIFIER_REDUCER = 'reducer';
+const MODIFIER_TRANSITION = 'transition';
 
 export function parse(tokens) {
   let position = 0;
@@ -9,6 +10,7 @@ export function parse(tokens) {
     props: [],
     states: [],
     reducers: [],
+    transitions: [],
     contexts: [],
     callbacks: [],
     effects: [],
@@ -106,6 +108,7 @@ export function parse(tokens) {
 
   // Parse state declaration: @name = value or @name::type = value
   // Or reducer declaration: @name:reducer = value
+  // Or transition declaration: @name:transition
   const parseState = () => {
     consume(TOKEN_TYPES.STATE);
     const name = consume(TOKEN_TYPES.IDENTIFIER, 'Expected state name').value;
@@ -117,6 +120,14 @@ export function parse(tokens) {
       consume(TOKEN_TYPES.ASSIGN);
       const reducerValue = parseReducerValue();
       ast.reducers.push({ name, ...reducerValue });
+      return;
+    }
+
+    // Check for :transition modifier
+    if (peek()?.type === TOKEN_TYPES.PROP && peek(1)?.type === TOKEN_TYPES.IDENTIFIER && peek(1)?.value === MODIFIER_TRANSITION) {
+      advance(); // consume :
+      advance(); // consume 'transition'
+      ast.transitions.push({ name });
       return;
     }
 
