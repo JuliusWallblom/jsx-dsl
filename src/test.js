@@ -35,6 +35,16 @@ test('tokenizes single $ as EFFECT token (not LAYOUT_EFFECT)', () => {
   assert.strictEqual(tokens[1].value, 'log');
 });
 
+// Layout effect parsing
+test('parses $$functionName(args) as layout effect declaration', () => {
+  const tokens = tokenize('$$measure(element)');
+  const ast = parse(tokens);
+
+  assert.strictEqual(ast.layoutEffects.length, 1);
+  assert.strictEqual(ast.layoutEffects[0].functionName, 'measure');
+  assert.strictEqual(ast.layoutEffects[0].args.length, 1);
+});
+
 // Handle tokenization
 test('tokenizes ~ as HANDLE token', () => {
   const tokens = tokenize('~focus');
