@@ -28,6 +28,7 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
   const imports = ['React'];
   if (ast.states.length > 0) imports.push('useState');
   if (ast.reducers?.length > 0) imports.push('useReducer');
+  if (ast.transitions?.length > 0) imports.push('useTransition');
   if (ast.contexts?.length > 0) imports.push('useContext');
   if (ast.callbacks?.length > 0) imports.push('useCallback');
   if (ast.effects.length > 0) imports.push('useEffect');
@@ -95,6 +96,14 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
     addLine(`  const [${reducer.name}, ${dispatchName}] = useReducer(${reducerName}, ${initialValue});`);
   }
   if (ast.reducers?.length > 0) addLine('');
+
+  // Generate useTransition hooks
+  for (const transition of ast.transitions || []) {
+    const isPendingName = `isPending${capitalize(transition.name)}`;
+    const startTransitionName = `start${capitalize(transition.name)}Transition`;
+    addLine(`  const [${isPendingName}, ${startTransitionName}] = useTransition();`);
+  }
+  if (ast.transitions?.length > 0) addLine('');
 
   // Generate useContext hooks
   for (const context of ast.contexts || []) {

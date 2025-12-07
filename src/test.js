@@ -160,6 +160,27 @@ test('generates useReducer hook and reducer function', () => {
   assert.ok(code.includes('dispatchCount'), 'should generate dispatch with naming convention');
 });
 
+// Transition modifier parsing
+test('parses @name:transition as transition declaration', () => {
+  const tokens = tokenize('@submit:transition');
+  const ast = parse(tokens);
+
+  assert.strictEqual(ast.transitions.length, 1);
+  assert.strictEqual(ast.transitions[0].name, 'submit');
+});
+
+// Code generation for useTransition
+test('generates useTransition hook with proper naming', () => {
+  const code = compile(`
+@submit:transition
+<div>content</div>
+`);
+
+  assert.ok(code.includes('useTransition'), 'should import useTransition');
+  assert.ok(code.includes('isPendingSubmit'), 'should generate isPending flag with capitalized name');
+  assert.ok(code.includes('startSubmitTransition'), 'should generate startTransition function with naming convention');
+});
+
 // Summary
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);
