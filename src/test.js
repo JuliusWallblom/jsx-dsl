@@ -369,6 +369,15 @@ test('generates useOptimistic hook for optimistic declarations', () => {
   assert.ok(code.includes('const [optimisticTodos, addOptimisticTodos] = useOptimistic(todos'), 'should generate useOptimistic call');
 });
 
+// ID tokenization
+test('tokenizes * as ID token', () => {
+  const tokens = tokenize('*formId');
+
+  assert.strictEqual(tokens[0].type, 'ID');
+  assert.strictEqual(tokens[1].type, 'IDENTIFIER');
+  assert.strictEqual(tokens[1].value, 'formId');
+});
+
 // Summary
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);

@@ -25,6 +25,9 @@ export const TOKEN_TYPES = {
   // Handle
   HANDLE: 'HANDLE',         // ~ for useImperativeHandle
 
+  // ID
+  ID: 'ID',                 // * for useId
+
   // Operators
   ASSIGN: 'ASSIGN',         // =
   PLUS: 'PLUS',             // +
@@ -215,7 +218,12 @@ export function tokenize(input) {
 
     if (char === '*') {
       advance();
-      addToken(TOKEN_TYPES.MULTIPLY);
+      // Check if followed by identifier (ID token) or used as multiply
+      if (/[a-zA-Z_]/.test(peek())) {
+        addToken(TOKEN_TYPES.ID);
+      } else {
+        addToken(TOKEN_TYPES.MULTIPLY);
+      }
       continue;
     }
 
