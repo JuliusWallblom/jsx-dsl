@@ -3,6 +3,7 @@ import { TOKEN_TYPES } from './tokenizer-ts.js';
 const MODIFIER_REDUCER = 'reducer';
 const MODIFIER_TRANSITION = 'transition';
 const MODIFIER_DEFERRED = 'deferred';
+const MODIFIER_OPTIMISTIC = 'optimistic';
 
 export function parse(tokens) {
   let position = 0;
@@ -13,6 +14,7 @@ export function parse(tokens) {
     reducers: [],
     transitions: [],
     deferredValues: [],
+    optimistics: [],
     contexts: [],
     callbacks: [],
     refs: [],
@@ -146,10 +148,30 @@ export function parse(tokens) {
       return;
     }
 
+    // Check for :optimistic modifier
+    if (peek()?.type === TOKEN_TYPES.PROP && peek(1)?.type === TOKEN_TYPES.IDENTIFIER && peek(1)?.value === MODIFIER_OPTIMISTIC) {
+      advance(); // consume :
+      advance(); // consume 'optimistic'
+      consume(TOKEN_TYPES.ASSIGN);
+      const optimisticValue = parseOptimisticValue();
+      ast.optimistics.push({ name, ...optimisticValue });
+      return;
+    }
+
     const typeAnnotation = parseTypeAnnotation();
     consume(TOKEN_TYPES.ASSIGN);
     const value = parseExpression();
     ast.states.push({ name, type: typeAnnotation, initialValue: value });
+  };
+
+  // Parse optimistic value: {state, updateFn}
+  const parseOptimisticValue = () => {
+    consume(TOKEN_TYPES.LBRACE);
+    const state = parseExpression();
+    consume(TOKEN_TYPES.COMMA);
+    const updateFn = parseExpression();
+    consume(TOKEN_TYPES.RBRACE);
+    return { state, updateFn };
   };
 
   // Parse reducer value: {initialValue, {actions}} or just initialValue

@@ -345,6 +345,18 @@ test('generates useDeferredValue hook for deferred value declarations', () => {
   assert.ok(code.includes('const deferredQuery = useDeferredValue(query)'), 'should generate useDeferredValue call');
 });
 
+// Optimistic modifier parsing
+test('parses @name:optimistic = {state, updateFn} as optimistic declaration', () => {
+  const tokens = tokenize('@optimisticTodos:optimistic = {todos, (state, newTodo) => state}');
+  const ast = parse(tokens);
+
+  assert.strictEqual(ast.optimistics.length, 1);
+  assert.strictEqual(ast.optimistics[0].name, 'optimisticTodos');
+  assert.strictEqual(ast.optimistics[0].state.type, 'Identifier');
+  assert.strictEqual(ast.optimistics[0].state.name, 'todos');
+  assert.strictEqual(ast.optimistics[0].updateFn.type, 'ArrowFunction');
+});
+
 // Summary
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);
