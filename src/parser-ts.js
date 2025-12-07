@@ -14,6 +14,7 @@ export function parse(tokens) {
     contexts: [],
     callbacks: [],
     refs: [],
+    handles: [],
     effects: [],
     memos: [],
     events: {},
@@ -235,6 +236,15 @@ export function parse(tokens) {
     }
 
     ast.refs.push({ name, type: typeAnnotation, initialValue });
+  };
+
+  // Parse handle declaration: ~name = arrowFunction
+  const parseHandle = () => {
+    consume(TOKEN_TYPES.HANDLE);
+    const name = consume(TOKEN_TYPES.IDENTIFIER, 'Expected handle name').value;
+    consume(TOKEN_TYPES.ASSIGN);
+    const value = parseExpression();
+    ast.handles.push({ name, value });
   };
 
   // Parse expressions (simplified for now)
@@ -538,6 +548,9 @@ export function parse(tokens) {
         break;
       case TOKEN_TYPES.REF:
         parseRef();
+        break;
+      case TOKEN_TYPES.HANDLE:
+        parseHandle();
         break;
       case TOKEN_TYPES.LT:
         ast.jsx = parseJSX();

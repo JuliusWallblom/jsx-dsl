@@ -27,6 +27,16 @@ test('tokenizes ~ as HANDLE token', () => {
   assert.strictEqual(tokens[1].value, 'focus');
 });
 
+// Handle parsing
+test('parses ~name = arrowFn as handle declaration', () => {
+  const tokens = tokenize('~focus = () => doSomething');
+  const ast = parse(tokens);
+
+  assert.strictEqual(ast.handles.length, 1);
+  assert.strictEqual(ast.handles[0].name, 'focus');
+  assert.strictEqual(ast.handles[0].value.type, 'ArrowFunction');
+});
+
 // Ref tokenization
 test('tokenizes # as REF token', () => {
   const tokens = tokenize('#inputRef');
