@@ -43,6 +43,7 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
   if (ast.deferredValues?.length > 0) imports.push('useDeferredValue');
   if (ast.optimistics?.length > 0) imports.push('useOptimistic');
   if (ast.ids?.length > 0) imports.push('useId');
+  if (ast.syncs?.length > 0) imports.push('useSyncExternalStore');
 
   const importList = imports.length > 1
     ? `React, { ${imports.slice(1).join(', ')} }`
@@ -126,6 +127,19 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
     addLine(`  const [${optimistic.name}, ${addFnName}] = useOptimistic(${state}, ${updateFn});`);
   }
   if (ast.optimistics?.length > 0) addLine('');
+
+  // Generate useSyncExternalStore hooks
+  for (const sync of ast.syncs || []) {
+    const subscribe = expressionToJS(sync.subscribe);
+    const getSnapshot = expressionToJS(sync.getSnapshot);
+    if (sync.getServerSnapshot) {
+      const getServerSnapshot = expressionToJS(sync.getServerSnapshot);
+      addLine(`  const ${sync.name} = useSyncExternalStore(${subscribe}, ${getSnapshot}, ${getServerSnapshot});`);
+    } else {
+      addLine(`  const ${sync.name} = useSyncExternalStore(${subscribe}, ${getSnapshot});`);
+    }
+  }
+  if (ast.syncs?.length > 0) addLine('');
 
   // Generate useReducer hooks
   for (const reducer of ast.reducers || []) {

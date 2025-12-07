@@ -398,6 +398,30 @@ test('generates useId hook for id declarations', () => {
   assert.ok(code.includes('const formId = useId()'), 'should generate useId call');
 });
 
+// Sync modifier parsing
+test('parses @name:sync = {subscribe, getSnapshot} as sync declaration', () => {
+  const tokens = tokenize('@storeValue:sync = {subscribe, getSnapshot}');
+  const ast = parse(tokens);
+
+  assert.strictEqual(ast.syncs.length, 1);
+  assert.strictEqual(ast.syncs[0].name, 'storeValue');
+  assert.strictEqual(ast.syncs[0].subscribe.type, 'Identifier');
+  assert.strictEqual(ast.syncs[0].subscribe.name, 'subscribe');
+  assert.strictEqual(ast.syncs[0].getSnapshot.type, 'Identifier');
+  assert.strictEqual(ast.syncs[0].getSnapshot.name, 'getSnapshot');
+});
+
+// Code generation for useSyncExternalStore
+test('generates useSyncExternalStore hook for sync declarations', () => {
+  const code = compile(`
+@storeValue:sync = {subscribe, getSnapshot}
+<div>content</div>
+`);
+
+  assert.ok(code.includes('useSyncExternalStore'), 'should import useSyncExternalStore');
+  assert.ok(code.includes('const storeValue = useSyncExternalStore(subscribe, getSnapshot)'), 'should generate useSyncExternalStore call');
+});
+
 // Summary
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);

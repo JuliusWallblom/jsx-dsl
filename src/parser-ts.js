@@ -4,6 +4,7 @@ const MODIFIER_REDUCER = 'reducer';
 const MODIFIER_TRANSITION = 'transition';
 const MODIFIER_DEFERRED = 'deferred';
 const MODIFIER_OPTIMISTIC = 'optimistic';
+const MODIFIER_SYNC = 'sync';
 
 export function parse(tokens) {
   let position = 0;
@@ -15,6 +16,7 @@ export function parse(tokens) {
     transitions: [],
     deferredValues: [],
     optimistics: [],
+    syncs: [],
     contexts: [],
     callbacks: [],
     refs: [],
@@ -159,6 +161,16 @@ export function parse(tokens) {
       return;
     }
 
+    // Check for :sync modifier
+    if (peek()?.type === TOKEN_TYPES.PROP && peek(1)?.type === TOKEN_TYPES.IDENTIFIER && peek(1)?.value === MODIFIER_SYNC) {
+      advance(); // consume :
+      advance(); // consume 'sync'
+      consume(TOKEN_TYPES.ASSIGN);
+      const syncValue = parseSyncValue();
+      ast.syncs.push({ name, ...syncValue });
+      return;
+    }
+
     const typeAnnotation = parseTypeAnnotation();
     consume(TOKEN_TYPES.ASSIGN);
     const value = parseExpression();
@@ -173,6 +185,21 @@ export function parse(tokens) {
     const updateFn = parseExpression();
     consume(TOKEN_TYPES.RBRACE);
     return { state, updateFn };
+  };
+
+  // Parse sync value: {subscribe, getSnapshot} or {subscribe, getSnapshot, getServerSnapshot}
+  const parseSyncValue = () => {
+    consume(TOKEN_TYPES.LBRACE);
+    const subscribe = parseExpression();
+    consume(TOKEN_TYPES.COMMA);
+    const getSnapshot = parseExpression();
+    let getServerSnapshot = null;
+    if (peek()?.type === TOKEN_TYPES.COMMA) {
+      advance();
+      getServerSnapshot = parseExpression();
+    }
+    consume(TOKEN_TYPES.RBRACE);
+    return { subscribe, getSnapshot, getServerSnapshot };
   };
 
   // Parse reducer value: {initialValue, {actions}} or just initialValue
