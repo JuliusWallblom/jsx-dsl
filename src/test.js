@@ -200,6 +200,21 @@ test('generates useTransition hook with proper naming', () => {
   assert.ok(code.includes('startSubmitTransition'), 'should generate startTransition function with naming convention');
 });
 
+// Code generation for useImperativeHandle
+test('generates forwardRef and useImperativeHandle for handle declarations', () => {
+  const code = compile(`
+~focus = () => doSomething
+<div>content</div>
+`);
+
+  assert.ok(code.includes('forwardRef'), 'should import forwardRef');
+  assert.ok(code.includes('useImperativeHandle'), 'should import useImperativeHandle');
+  assert.ok(code.includes('forwardRef('), 'should wrap component with forwardRef');
+  assert.ok(code.includes(', ref)'), 'should include ref parameter');
+  assert.ok(code.includes('useImperativeHandle(ref'), 'should generate useImperativeHandle call');
+  assert.ok(code.includes('focus:'), 'should include handle method in exposed object');
+});
+
 // Summary
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);
