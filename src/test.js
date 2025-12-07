@@ -221,6 +221,35 @@ test('generates useTransition hook with proper naming', () => {
   assert.ok(code.includes('startSubmitTransition'), 'should generate startTransition function with naming convention');
 });
 
+// Code generation for useRef
+test('generates useRef hook for ref declarations', () => {
+  const code = compile(`
+#inputRef
+<div>content</div>
+`);
+
+  assert.ok(code.includes('useRef'), 'should import useRef');
+  assert.ok(code.includes('const inputRef = useRef(null)'), 'should generate useRef call with null default');
+});
+
+test('generates useRef with type annotation', () => {
+  const code = compile(`
+#inputRef::HTMLInputElement
+<div>content</div>
+`);
+
+  assert.ok(code.includes('useRef<HTMLInputElement>(null)'), 'should generate typed useRef');
+});
+
+test('generates useRef with initial value', () => {
+  const code = compile(`
+#count = 0
+<div>content</div>
+`);
+
+  assert.ok(code.includes('const count = useRef(0)'), 'should generate useRef with initial value');
+});
+
 // Summary
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);

@@ -31,6 +31,7 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
   if (ast.transitions?.length > 0) imports.push('useTransition');
   if (ast.contexts?.length > 0) imports.push('useContext');
   if (ast.callbacks?.length > 0) imports.push('useCallback');
+  if (ast.refs?.length > 0) imports.push('useRef');
   if (ast.effects.length > 0) imports.push('useEffect');
   if (ast.memos.length > 0) imports.push('useMemo');
 
@@ -122,6 +123,14 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
     addLine(`  const ${callback.name} = useCallback(${fn}, [${deps.join(', ')}]);`);
   }
   if (ast.callbacks?.length > 0) addLine('');
+
+  // Generate useRef hooks
+  for (const ref of ast.refs || []) {
+    const initialValue = ref.initialValue ? expressionToJS(ref.initialValue) : 'null';
+    const typeAnnotation = ref.type ? `<${typeToTypeScript(ref.type)}>` : '';
+    addLine(`  const ${ref.name} = useRef${typeAnnotation}(${initialValue});`);
+  }
+  if (ast.refs?.length > 0) addLine('');
 
   // Generate memo declarations with types
   for (const memo of ast.memos) {
