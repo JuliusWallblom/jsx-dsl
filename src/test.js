@@ -411,6 +411,17 @@ test('parses @name:sync = {subscribe, getSnapshot} as sync declaration', () => {
   assert.strictEqual(ast.syncs[0].getSnapshot.name, 'getSnapshot');
 });
 
+// Code generation for useSyncExternalStore
+test('generates useSyncExternalStore hook for sync declarations', () => {
+  const code = compile(`
+@storeValue:sync = {subscribe, getSnapshot}
+<div>content</div>
+`);
+
+  assert.ok(code.includes('useSyncExternalStore'), 'should import useSyncExternalStore');
+  assert.ok(code.includes('const storeValue = useSyncExternalStore(subscribe, getSnapshot)'), 'should generate useSyncExternalStore call');
+});
+
 // Summary
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);
