@@ -27,6 +27,7 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
   // Generate imports - only import what we need
   const imports = ['React'];
   if (ast.states.length > 0) imports.push('useState');
+  if (ast.reducers?.length > 0) imports.push('useReducer');
   if (ast.effects.length > 0) imports.push('useEffect');
   if (ast.memos.length > 0) imports.push('useMemo');
 
@@ -48,6 +49,21 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
     addLine('');
   }
 
+  // Generate reducer functions
+  for (const reducer of ast.reducers || []) {
+    const reducerName = `${reducer.name}Reducer`;
+    addLine(`function ${reducerName}(state, action) {`);
+    addLine(`  switch (action.type) {`);
+    for (const action of reducer.actions) {
+      const body = arrowFunctionBodyToJS(action.handler, 'state');
+      addLine(`    case '${action.name}': return ${body};`);
+    }
+    addLine(`    default: return state;`);
+    addLine(`  }`);
+    addLine(`}`);
+    addLine('');
+  }
+
   // Start component function
   const propsParam = ast.props.length > 0
     ? `{ ${ast.props.map(p => p.name).join(', ')} }: ${componentName}Props`
@@ -61,6 +77,15 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
     addLine(`  const [${state.name}, set${capitalize(state.name)}] = useState${typeAnnotation}(${initialValue});`);
   }
   if (ast.states.length > 0) addLine('');
+
+  // Generate useReducer hooks
+  for (const reducer of ast.reducers || []) {
+    const reducerName = `${reducer.name}Reducer`;
+    const dispatchName = `dispatch${capitalize(reducer.name)}`;
+    const initialValue = expressionToJS(reducer.initialValue);
+    addLine(`  const [${reducer.name}, ${dispatchName}] = useReducer(${reducerName}, ${initialValue});`);
+  }
+  if (ast.reducers?.length > 0) addLine('');
 
   // Generate memo declarations with types
   for (const memo of ast.memos) {
@@ -139,6 +164,31 @@ function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+function arrowFunctionBodyToJS(expr, paramReplacement = null) {
+  if (expr.type === 'ArrowFunction') {
+    const body = expr.body;
+    if (paramReplacement && expr.params.length > 0) {
+      const paramName = expr.params[0];
+      return expressionToJSWithReplacement(body, paramName, paramReplacement);
+    }
+    return expressionToJS(body);
+  }
+  return expressionToJS(expr);
+}
+
+function expressionToJSWithReplacement(expr, from, to) {
+  if (!expr) return 'undefined';
+  if (expr.type === 'Identifier' && expr.name === from) {
+    return to;
+  }
+  if (expr.type === 'BinaryOp') {
+    const left = expressionToJSWithReplacement(expr.left, from, to);
+    const right = expressionToJSWithReplacement(expr.right, from, to);
+    return `${left} ${expr.operator} ${right}`;
+  }
+  return expressionToJS(expr);
+}
+
 function expressionToJS(expr) {
   if (!expr) return 'undefined';
 
@@ -165,6 +215,10 @@ function expressionToJS(expr) {
       return `${expr.object}.${expr.method}(${args})`;
     case 'PropertyAccess':
       return `${expr.object}.${expr.property}`;
+    case 'ArrowFunction':
+      const arrowParams = expr.params.join(', ');
+      const arrowBody = expressionToJS(expr.body);
+      return `(${arrowParams}) => ${arrowBody}`;
     case 'Array':
       const elements = expr.elements.map(expressionToJS).join(', ');
       return `[${elements}]`;

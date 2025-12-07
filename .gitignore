@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
 
+# Beads
+.beads/
+
 # Compiled output
 *.jsx
 *.tsx

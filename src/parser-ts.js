@@ -1,11 +1,14 @@
 import { TOKEN_TYPES } from './tokenizer-ts.js';
 
+const MODIFIER_REDUCER = 'reducer';
+
 export function parse(tokens) {
   let position = 0;
   const ast = {
     type: 'Component',
     props: [],
     states: [],
+    reducers: [],
     effects: [],
     memos: [],
     events: {},
@@ -100,13 +103,55 @@ export function parse(tokens) {
   };
 
   // Parse state declaration: @name = value or @name::type = value
+  // Or reducer declaration: @name:reducer = value
   const parseState = () => {
     consume(TOKEN_TYPES.STATE);
     const name = consume(TOKEN_TYPES.IDENTIFIER, 'Expected state name').value;
+
+    // Check for :reducer modifier
+    if (peek()?.type === TOKEN_TYPES.PROP && peek(1)?.type === TOKEN_TYPES.IDENTIFIER && peek(1)?.value === MODIFIER_REDUCER) {
+      advance(); // consume :
+      advance(); // consume 'reducer'
+      consume(TOKEN_TYPES.ASSIGN);
+      const reducerValue = parseReducerValue();
+      ast.reducers.push({ name, ...reducerValue });
+      return;
+    }
+
     const typeAnnotation = parseTypeAnnotation();
     consume(TOKEN_TYPES.ASSIGN);
     const value = parseExpression();
     ast.states.push({ name, type: typeAnnotation, initialValue: value });
+  };
+
+  // Parse reducer value: {initialValue, {actions}} or just initialValue
+  const parseReducerValue = () => {
+    if (peek()?.type !== TOKEN_TYPES.LBRACE) {
+      // Simple initial value without actions
+      return { initialValue: parseExpression(), actions: [] };
+    }
+
+    consume(TOKEN_TYPES.LBRACE);
+    const initialValue = parseExpression();
+    consume(TOKEN_TYPES.COMMA);
+
+    // Parse actions object
+    consume(TOKEN_TYPES.LBRACE);
+    const actions = [];
+    while (peek()?.type !== TOKEN_TYPES.RBRACE) {
+      const actionName = consume(TOKEN_TYPES.IDENTIFIER, 'Expected action name').value;
+      consume(TOKEN_TYPES.PROP); // :
+      const handler = parseExpression();
+      actions.push({ name: actionName, handler });
+
+      if (peek()?.type === TOKEN_TYPES.COMMA) {
+        advance();
+      }
+    }
+    consume(TOKEN_TYPES.RBRACE); // close actions
+    consume(TOKEN_TYPES.RBRACE); // close reducer object
+
+    return { initialValue, actions };
   };
 
   // Parse effect declaration: $functionName(args)
@@ -162,6 +207,13 @@ export function parse(tokens) {
 
     if (token?.type === TOKEN_TYPES.IDENTIFIER) {
       const name = advance().value;
+
+      // Check for arrow function: param => body
+      if (peek()?.type === TOKEN_TYPES.ARROW) {
+        advance(); // consume =>
+        const body = parseExpression();
+        return { type: 'ArrowFunction', params: [name], body };
+      }
 
       // Check for increment/decrement
       if (peek()?.type === TOKEN_TYPES.INCREMENT) {

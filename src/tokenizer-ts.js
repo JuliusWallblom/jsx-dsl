@@ -165,7 +165,7 @@ export function tokenize(input) {
       continue;
     }
 
-    if (char === '=' && peek() === '>') {
+    if (char === '=' && peek(1) === '>') {
       advance();
       advance();
       addToken(TOKEN_TYPES.ARROW);
