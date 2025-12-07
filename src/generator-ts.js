@@ -24,14 +24,19 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
   // Component name (derived from filename or default)
   const componentName = options.componentName || 'Component';
 
+  // Check if we need forwardRef
+  const hasHandles = ast.handles?.length > 0;
+
   // Generate imports - only import what we need
   const imports = ['React'];
+  if (hasHandles) imports.push('forwardRef');
   if (ast.states.length > 0) imports.push('useState');
   if (ast.reducers?.length > 0) imports.push('useReducer');
   if (ast.transitions?.length > 0) imports.push('useTransition');
   if (ast.contexts?.length > 0) imports.push('useContext');
   if (ast.callbacks?.length > 0) imports.push('useCallback');
   if (ast.refs?.length > 0) imports.push('useRef');
+  if (hasHandles) imports.push('useImperativeHandle');
   if (ast.effects.length > 0) imports.push('useEffect');
   if (ast.memos.length > 0) imports.push('useMemo');
 
@@ -79,7 +84,14 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
   const propsParam = ast.props.length > 0
     ? `{ ${ast.props.map(p => p.name).join(', ')} }: ${componentName}Props`
     : '';
-  addLine(`function ${componentName}(${propsParam}) {`);
+
+  if (hasHandles) {
+    // Wrap with forwardRef
+    const propsParamForRef = ast.props.length > 0 ? propsParam : 'props';
+    addLine(`const ${componentName} = forwardRef((${propsParamForRef}, ref) => {`);
+  } else {
+    addLine(`function ${componentName}(${propsParam}) {`);
+  }
 
   // Generate state declarations with types
   for (const state of ast.states) {
@@ -132,6 +144,17 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
   }
   if (ast.refs?.length > 0) addLine('');
 
+  // Generate useImperativeHandle hook
+  if (hasHandles) {
+    addLine(`  useImperativeHandle(ref, () => ({`);
+    for (const handle of ast.handles) {
+      const fn = expressionToJS(handle.value);
+      addLine(`    ${handle.name}: ${fn},`);
+    }
+    addLine(`  }));`);
+    addLine('');
+  }
+
   // Generate memo declarations with types
   for (const memo of ast.memos) {
     const value = expressionToJS(memo.value);
@@ -171,7 +194,11 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
   addLine('  );');
 
   // Close component function
-  addLine('}');
+  if (hasHandles) {
+    addLine('});');
+  } else {
+    addLine('}');
+  }
   addLine('');
   addLine(`export default ${componentName};`);
 

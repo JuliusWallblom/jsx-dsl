@@ -269,6 +269,20 @@ test('generates useRef with initial value', () => {
   assert.ok(code.includes('const count = useRef(0)'), 'should generate useRef with initial value');
 });
 
+// Code generation for useImperativeHandle
+test('generates forwardRef and useImperativeHandle for handle declarations', () => {
+  const code = compile(`
+~focus = () => doFocus
+<div>content</div>
+`);
+
+  assert.ok(code.includes('forwardRef'), 'should import forwardRef');
+  assert.ok(code.includes('useImperativeHandle'), 'should import useImperativeHandle');
+  assert.ok(code.includes('forwardRef('), 'should wrap component with forwardRef');
+  assert.ok(code.includes('useImperativeHandle(ref'), 'should generate useImperativeHandle call');
+  assert.ok(code.includes('focus:'), 'should include focus method in handle object');
+});
+
 // Summary
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);
