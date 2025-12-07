@@ -37,6 +37,13 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
     : 'React';
 
   addLine(`import ${importList} from 'react';`);
+
+  // Generate imports for context objects
+  for (const context of ast.contexts || []) {
+    const contextObjectName = `${capitalize(context.name)}Context`;
+    addLine(`import { ${contextObjectName} } from './${contextObjectName}';`);
+  }
+
   addLine('');
 
   // Generate TypeScript interfaces for props

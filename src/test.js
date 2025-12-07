@@ -107,6 +107,15 @@ test('generates useContext hook for context consumption', () => {
   assert.ok(code.includes('const theme = useContext('), 'should generate useContext call');
 });
 
+test('generates import statement for context object', () => {
+  const code = compile(`
+&theme
+<div>{theme}</div>
+`);
+
+  assert.ok(code.includes("import { ThemeContext } from './ThemeContext'"), 'should import context object');
+});
+
 // Code generation for useReducer
 test('generates useReducer hook and reducer function', () => {
   const code = compile(`
