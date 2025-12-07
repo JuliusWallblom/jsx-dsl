@@ -3,6 +3,7 @@ export const TOKEN_TYPES = {
   // DSL symbols
   STATE: 'STATE',           // @
   EFFECT: 'EFFECT',         // $
+  LAYOUT_EFFECT: 'LAYOUT_EFFECT', // $$ for useLayoutEffect
   MEMO: 'MEMO',             // %
   PROP: 'PROP',             // :
   EVENT: 'EVENT',           // !
@@ -103,7 +104,12 @@ export function tokenize(input) {
 
     if (char === '$') {
       advance();
-      addToken(TOKEN_TYPES.EFFECT);
+      if (peek() === '$') {
+        advance();
+        addToken(TOKEN_TYPES.LAYOUT_EFFECT);
+      } else {
+        addToken(TOKEN_TYPES.EFFECT);
+      }
       continue;
     }
 

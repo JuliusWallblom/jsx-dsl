@@ -16,6 +16,7 @@ export function parse(tokens) {
     refs: [],
     handles: [],
     effects: [],
+    layoutEffects: [],
     memos: [],
     events: {},
     jsx: null
@@ -185,6 +186,24 @@ export function parse(tokens) {
     consume(TOKEN_TYPES.RPAREN);
 
     ast.effects.push({ functionName, args });
+  };
+
+  // Parse layout effect declaration: $$functionName(args)
+  const parseLayoutEffect = () => {
+    consume(TOKEN_TYPES.LAYOUT_EFFECT);
+    const functionName = consume(TOKEN_TYPES.IDENTIFIER, 'Expected function name').value;
+    consume(TOKEN_TYPES.LPAREN);
+
+    const args = [];
+    while (peek()?.type !== TOKEN_TYPES.RPAREN) {
+      args.push(parseExpression());
+      if (peek()?.type === TOKEN_TYPES.COMMA) {
+        advance();
+      }
+    }
+    consume(TOKEN_TYPES.RPAREN);
+
+    ast.layoutEffects.push({ functionName, args });
   };
 
   // Parse memo declaration: %name = expression or %name::type = expression
@@ -533,6 +552,9 @@ export function parse(tokens) {
         break;
       case TOKEN_TYPES.EFFECT:
         parseEffect();
+        break;
+      case TOKEN_TYPES.LAYOUT_EFFECT:
+        parseLayoutEffect();
         break;
       case TOKEN_TYPES.MEMO:
         parseMemo();

@@ -18,6 +18,33 @@ function test(name, fn) {
   }
 }
 
+// Layout effect tokenization
+test('tokenizes $$ as LAYOUT_EFFECT token', () => {
+  const tokens = tokenize('$$measure(el)');
+
+  assert.strictEqual(tokens[0].type, 'LAYOUT_EFFECT');
+  assert.strictEqual(tokens[1].type, 'IDENTIFIER');
+  assert.strictEqual(tokens[1].value, 'measure');
+});
+
+test('tokenizes single $ as EFFECT token (not LAYOUT_EFFECT)', () => {
+  const tokens = tokenize('$log(x)');
+
+  assert.strictEqual(tokens[0].type, 'EFFECT');
+  assert.strictEqual(tokens[1].type, 'IDENTIFIER');
+  assert.strictEqual(tokens[1].value, 'log');
+});
+
+// Layout effect parsing
+test('parses $$functionName(args) as layout effect declaration', () => {
+  const tokens = tokenize('$$measure(element)');
+  const ast = parse(tokens);
+
+  assert.strictEqual(ast.layoutEffects.length, 1);
+  assert.strictEqual(ast.layoutEffects[0].functionName, 'measure');
+  assert.strictEqual(ast.layoutEffects[0].args.length, 1);
+});
+
 // Handle tokenization
 test('tokenizes ~ as HANDLE token', () => {
   const tokens = tokenize('~focus');
@@ -281,6 +308,18 @@ test('generates forwardRef and useImperativeHandle for handle declarations', () 
   assert.ok(code.includes('forwardRef('), 'should wrap component with forwardRef');
   assert.ok(code.includes('useImperativeHandle(ref'), 'should generate useImperativeHandle call');
   assert.ok(code.includes('focus:'), 'should include focus method in handle object');
+});
+
+// Code generation for useLayoutEffect
+test('generates useLayoutEffect hook for layout effect declarations', () => {
+  const code = compile(`
+$$measure(element)
+<div>content</div>
+`);
+
+  assert.ok(code.includes('useLayoutEffect'), 'should import useLayoutEffect');
+  assert.ok(code.includes('useLayoutEffect(() =>'), 'should generate useLayoutEffect call');
+  assert.ok(code.includes('measure(element)'), 'should call the function with args');
 });
 
 // Summary
