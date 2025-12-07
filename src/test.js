@@ -18,6 +18,25 @@ function test(name, fn) {
   }
 }
 
+// Handle tokenization
+test('tokenizes ~ as HANDLE token', () => {
+  const tokens = tokenize('~focus');
+
+  assert.strictEqual(tokens[0].type, 'HANDLE');
+  assert.strictEqual(tokens[1].type, 'IDENTIFIER');
+  assert.strictEqual(tokens[1].value, 'focus');
+});
+
+// Handle parsing
+test('parses ~name = arrowFn as handle declaration', () => {
+  const tokens = tokenize('~focus = () => doSomething');
+  const ast = parse(tokens);
+
+  assert.strictEqual(ast.handles.length, 1);
+  assert.strictEqual(ast.handles[0].name, 'focus');
+  assert.strictEqual(ast.handles[0].value.type, 'ArrowFunction');
+});
+
 // Ref tokenization
 test('tokenizes # as REF token', () => {
   const tokens = tokenize('#inputRef');
@@ -248,6 +267,20 @@ test('generates useRef with initial value', () => {
 `);
 
   assert.ok(code.includes('const count = useRef(0)'), 'should generate useRef with initial value');
+});
+
+// Code generation for useImperativeHandle
+test('generates forwardRef and useImperativeHandle for handle declarations', () => {
+  const code = compile(`
+~focus = () => doFocus
+<div>content</div>
+`);
+
+  assert.ok(code.includes('forwardRef'), 'should import forwardRef');
+  assert.ok(code.includes('useImperativeHandle'), 'should import useImperativeHandle');
+  assert.ok(code.includes('forwardRef('), 'should wrap component with forwardRef');
+  assert.ok(code.includes('useImperativeHandle(ref'), 'should generate useImperativeHandle call');
+  assert.ok(code.includes('focus:'), 'should include focus method in handle object');
 });
 
 // Summary
