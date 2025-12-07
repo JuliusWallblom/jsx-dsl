@@ -1,19 +1,33 @@
 {
   "name": "jsx-dsl",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Ultra-minimal DSL that compiles to React with 70% less code. TypeScript, source maps, and VSCode support included.",
   "main": "./src/index.js",
+  "types": "./src/index.d.ts",
   "type": "module",
   "bin": {
     "jsx-dsl": "./src/cli.js"
   },
   "exports": {
-    ".": "./src/index.js",
-    "./vite": "./vite-plugin-jsx-dsl.js",
-    "./webpack": "./jsx-dsl-loader.js",
-    "./babel": "./babel-plugin-jsx-dsl.js",
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
+    },
+    "./vite": {
+      "types": "./vite-plugin-jsx-dsl.d.ts",
+      "import": "./vite-plugin-jsx-dsl.js"
+    },
+    "./webpack": {
+      "types": "./jsx-dsl-loader.d.ts",
+      "import": "./jsx-dsl-loader.js"
+    },
+    "./babel": {
+      "types": "./babel-plugin-jsx-dsl.d.ts",
+      "import": "./babel-plugin-jsx-dsl.js"
+    },
     "./runtime": "./src/runtime.js",
-    "./cli": "./src/cli.js"
+    "./cli": "./src/cli.js",
+    "./types": "./jsx-dsl.d.ts"
   },
   "scripts": {
     "compile": "node src/cli.js",
@@ -43,8 +57,12 @@
     "examples/",
     "vscode-extension/",
     "vite-plugin-jsx-dsl.js",
+    "vite-plugin-jsx-dsl.d.ts",
     "jsx-dsl-loader.js",
+    "jsx-dsl-loader.d.ts",
     "babel-plugin-jsx-dsl.js",
+    "babel-plugin-jsx-dsl.d.ts",
+    "jsx-dsl.d.ts",
     "*.md",
     "LICENSE"
   ],
