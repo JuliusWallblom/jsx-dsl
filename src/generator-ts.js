@@ -38,6 +38,7 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
   if (ast.refs?.length > 0) imports.push('useRef');
   if (hasHandles) imports.push('useImperativeHandle');
   if (ast.effects.length > 0) imports.push('useEffect');
+  if (ast.layoutEffects?.length > 0) imports.push('useLayoutEffect');
   if (ast.memos.length > 0) imports.push('useMemo');
 
   const importList = imports.length > 1
@@ -179,6 +180,22 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
     }
   }
   if (ast.effects.length > 0) addLine('');
+
+  // Generate layout effects
+  for (const effect of ast.layoutEffects || []) {
+    const deps = effect.args.map(arg => expressionToJS(arg));
+    if (effect.functionName === 'log') {
+      addLine(`  useLayoutEffect(() => {`);
+      addLine(`    console.log(${deps.join(', ')});`);
+      addLine(`  }, [${deps.join(', ')}]);`);
+    } else {
+      // Generic function call
+      addLine(`  useLayoutEffect(() => {`);
+      addLine(`    ${effect.functionName}(${deps.join(', ')});`);
+      addLine(`  }, [${deps.join(', ')}]);`);
+    }
+  }
+  if (ast.layoutEffects?.length > 0) addLine('');
 
   // Generate event handlers from ast.events
   for (const [eventName, handler] of Object.entries(ast.events)) {

@@ -310,6 +310,18 @@ test('generates forwardRef and useImperativeHandle for handle declarations', () 
   assert.ok(code.includes('focus:'), 'should include focus method in handle object');
 });
 
+// Code generation for useLayoutEffect
+test('generates useLayoutEffect hook for layout effect declarations', () => {
+  const code = compile(`
+$$measure(element)
+<div>content</div>
+`);
+
+  assert.ok(code.includes('useLayoutEffect'), 'should import useLayoutEffect');
+  assert.ok(code.includes('useLayoutEffect(() =>'), 'should generate useLayoutEffect call');
+  assert.ok(code.includes('measure(element)'), 'should call the function with args');
+});
+
 // Summary
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);
