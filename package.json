@@ -1,6 +1,6 @@
 {
   "name": "jsx-dsl",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Ultra-minimal DSL that compiles to React with 70% less code. TypeScript, source maps, and VSCode support included.",
   "main": "./src/index.js",
   "types": "./src/index.d.ts",
