@@ -18,6 +18,9 @@ export const TOKEN_TYPES = {
   // Callback
   CALLBACK: 'CALLBACK',     // ^ for useCallback
 
+  // Ref
+  REF: 'REF',               // # for useRef
+
   // Operators
   ASSIGN: 'ASSIGN',         // =
   PLUS: 'PLUS',             // +
@@ -147,6 +150,12 @@ export function tokenize(input) {
     if (char === '^') {
       advance();
       addToken(TOKEN_TYPES.CALLBACK);
+      continue;
+    }
+
+    if (char === '#') {
+      advance();
+      addToken(TOKEN_TYPES.REF);
       continue;
     }
 

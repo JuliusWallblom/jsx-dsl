@@ -18,6 +18,15 @@ function test(name, fn) {
   }
 }
 
+// Ref tokenization
+test('tokenizes # as REF token', () => {
+  const tokens = tokenize('#inputRef');
+
+  assert.strictEqual(tokens[0].type, 'REF');
+  assert.strictEqual(tokens[1].type, 'IDENTIFIER');
+  assert.strictEqual(tokens[1].value, 'inputRef');
+});
+
 // Callback tokenization
 test('tokenizes ^ as CALLBACK token', () => {
   const tokens = tokenize('^handler');
