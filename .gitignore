@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Compiled output
+*.jsx
+*.tsx
+*.js.map
+*.tsx.map
+
+# Build artifacts
+*.vsix
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Keep only source .jsx.dsl files in examples
+examples/*.jsx
+examples/*.tsx
+examples/*.map

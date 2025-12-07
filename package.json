@@ -1,0 +1,62 @@
+{
+  "name": "faster-lang",
+  "version": "1.1.0",
+  "description": "Ultra-minimal DSL that compiles to React with 70% less code. TypeScript, source maps, and VSCode support included.",
+  "main": "./src/index.js",
+  "type": "module",
+  "bin": {
+    "fst": "./src/cli.js"
+  },
+  "exports": {
+    ".": "./src/index.js",
+    "./vite": "./vite-plugin-faster.js",
+    "./webpack": "./fst-loader.js",
+    "./babel": "./babel-plugin-fst.js",
+    "./runtime": "./src/runtime.js",
+    "./cli": "./src/cli.js"
+  },
+  "scripts": {
+    "compile": "node src/cli.js",
+    "test": "node src/test.js"
+  },
+  "keywords": [
+    "react",
+    "dsl",
+    "compiler",
+    "jsx",
+    "typescript",
+    "faster",
+    "minimal",
+    "jsx.dsl"
+  ],
+  "author": "Faster Lang Team",
+  "license": "MIT",
+  "homepage": "https://github.com/faster/lang",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/faster/lang.git"
+  },
+  "bugs": {
+    "url": "https://github.com/faster/lang/issues"
+  },
+  "files": [
+    "src/",
+    "examples/",
+    "vscode-extension/",
+    "vite-plugin-faster.js",
+    "fst-loader.js",
+    "babel-plugin-fst.js",
+    "*.md",
+    "LICENSE"
+  ],
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "esbuild": "^0.25.10",
+    "source-map": "^0.7.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

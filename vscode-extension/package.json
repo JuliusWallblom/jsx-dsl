@@ -1,0 +1,48 @@
+{
+  "name": "fast-dsl",
+  "displayName": "Fast DSL",
+  "description": "Syntax highlighting and support for Fast DSL (.jsx.dsl) files",
+  "version": "0.1.0",
+  "publisher": "react-micro-dsl",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": ["Programming Languages"],
+  "contributes": {
+    "languages": [
+      {
+        "id": "jsx.dsl",
+        "aliases": ["Fast DSL", "jsx.dsl"],
+        "extensions": [".jsx.dsl"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "jsx.dsl",
+        "scopeName": "source.jsx.dsl",
+        "path": "./syntaxes/fst.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "jsx.dsl",
+        "path": "./snippets/fst.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "jsx.dsl.compile",
+        "title": "Compile JSX DSL to React"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "jsx.dsl.compile",
+        "key": "ctrl+shift+r",
+        "mac": "cmd+shift+r",
+        "when": "editorLangId == jsx.dsl"
+      }
+    ]
+  }
+}

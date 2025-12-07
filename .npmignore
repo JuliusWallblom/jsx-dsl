@@ -1,0 +1,38 @@
+# Development files
+*.log
+.DS_Store
+node_modules/
+.git/
+.gitignore
+
+# Test files
+test/
+*.test.js
+*.spec.js
+
+# Build artifacts
+*.jsx
+*.tsx
+*.map
+!src/**/*.js
+
+# Documentation
+SETUP.md
+package-npm.json
+
+# Examples (keep minimal examples)
+example-app/
+vite-example/
+
+# VSCode extension source (include the built vsix)
+vscode-extension/*.vsix
+!vscode-extension/fast-dsl-*.vsix
+
+# IDE
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.bak
+.cache/

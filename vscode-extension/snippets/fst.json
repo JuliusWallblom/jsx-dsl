@@ -1,0 +1,108 @@
+{
+  "State": {
+    "prefix": "@state",
+    "body": [
+      "@${1:name} = ${2:0}"
+    ],
+    "description": "Create a state variable"
+  },
+  "Typed State": {
+    "prefix": "@state::",
+    "body": [
+      "@${1:name}::${2:number} = ${3:0}"
+    ],
+    "description": "Create a typed state variable"
+  },
+  "Prop": {
+    "prefix": ":prop",
+    "body": [
+      ":${1:name}"
+    ],
+    "description": "Declare a prop"
+  },
+  "Typed Prop": {
+    "prefix": ":prop::",
+    "body": [
+      ":${1:name}::${2:string}"
+    ],
+    "description": "Declare a typed prop"
+  },
+  "Effect": {
+    "prefix": "$effect",
+    "body": [
+      "$$${1:log}(${2:variable})"
+    ],
+    "description": "Create an effect"
+  },
+  "Memo": {
+    "prefix": "%memo",
+    "body": [
+      "%${1:name} = ${2:expression}"
+    ],
+    "description": "Create a memoized value"
+  },
+  "Event Handler": {
+    "prefix": "!event",
+    "body": [
+      "!${1:click} = ${2:count++}"
+    ],
+    "description": "Create an event handler"
+  },
+  "Button": {
+    "prefix": "btn",
+    "body": [
+      "<btn @click=${1:handler}>${2:Label}</btn>"
+    ],
+    "description": "Create a button element"
+  },
+  "Input": {
+    "prefix": "input",
+    "body": [
+      "<input val={${1:value}} />"
+    ],
+    "description": "Create an input element"
+  },
+  "Each Loop": {
+    "prefix": "each",
+    "body": [
+      "<each ${1:item} in ${2:list}>",
+      "  ${3:<li>{${1:item}}</li>}",
+      "</each>"
+    ],
+    "description": "Create an each loop"
+  },
+  "Component Template": {
+    "prefix": "component",
+    "body": [
+      ":${1:title}",
+      "@${2:count} = 0",
+      "!${3:click} = ${2:count}++",
+      "",
+      "<div>",
+      "  <h1>{${1:title}}</h1>",
+      "  <p>Count: {${2:count}}</p>",
+      "  <btn @click=${3:click}>Increment</btn>",
+      "</div>"
+    ],
+    "description": "Create a complete component template"
+  },
+  "Todo List Template": {
+    "prefix": "todolist",
+    "body": [
+      "@${1:todos}::string[] = []",
+      "@${2:input}::string = \"\"",
+      "!${3:add} = ${1:todos}.push(${2:input})",
+      "",
+      "<div>",
+      "  <input val={${2:input}} />",
+      "  <btn @click=${3:add}>Add</btn>",
+      "  <ul>",
+      "    <each item::string in ${1:todos}>",
+      "      <li>{item}</li>",
+      "    </each>",
+      "  </ul>",
+      "</div>"
+    ],
+    "description": "Create a todo list component"
+  }
+}
