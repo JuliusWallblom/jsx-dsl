@@ -18,6 +18,15 @@ function test(name, fn) {
   }
 }
 
+// Context tokenization
+test('tokenizes & as CONTEXT token', () => {
+  const tokens = tokenize('&theme');
+
+  assert.strictEqual(tokens[0].type, 'CONTEXT');
+  assert.strictEqual(tokens[1].type, 'IDENTIFIER');
+  assert.strictEqual(tokens[1].value, 'theme');
+});
+
 // Arrow function parsing
 test('parses arrow function expression: s => s + 1', () => {
   const result = parseExpr('s => s + 1');

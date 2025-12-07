@@ -11,7 +11,9 @@ export const TOKEN_TYPES = {
   COLON_TYPE: 'COLON_TYPE', // :: for type annotations
   QUESTION: 'QUESTION',     // ? for optional types
   PIPE: 'PIPE',             // | for union types
-  AMPERSAND: 'AMPERSAND',   // & for intersection types
+
+  // Context
+  CONTEXT: 'CONTEXT',       // & for useContext
 
   // Operators
   ASSIGN: 'ASSIGN',         // =
@@ -135,7 +137,7 @@ export function tokenize(input) {
 
     if (char === '&') {
       advance();
-      addToken(TOKEN_TYPES.AMPERSAND);
+      addToken(TOKEN_TYPES.CONTEXT);
       continue;
     }
 
