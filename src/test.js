@@ -357,6 +357,18 @@ test('parses @name:optimistic = {state, updateFn} as optimistic declaration', ()
   assert.strictEqual(ast.optimistics[0].updateFn.type, 'ArrowFunction');
 });
 
+// Code generation for useOptimistic
+test('generates useOptimistic hook for optimistic declarations', () => {
+  const code = compile(`
+@todos = []
+@optimisticTodos:optimistic = {todos, (state, newTodo) => state}
+<div>content</div>
+`);
+
+  assert.ok(code.includes('useOptimistic'), 'should import useOptimistic');
+  assert.ok(code.includes('const [optimisticTodos, addOptimisticTodos] = useOptimistic(todos'), 'should generate useOptimistic call');
+});
+
 // Summary
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);

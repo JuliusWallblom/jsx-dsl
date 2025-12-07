@@ -41,6 +41,7 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
   if (ast.layoutEffects?.length > 0) imports.push('useLayoutEffect');
   if (ast.memos.length > 0) imports.push('useMemo');
   if (ast.deferredValues?.length > 0) imports.push('useDeferredValue');
+  if (ast.optimistics?.length > 0) imports.push('useOptimistic');
 
   const importList = imports.length > 1
     ? `React, { ${imports.slice(1).join(', ')} }`
@@ -109,6 +110,15 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
     addLine(`  const ${deferred.name} = useDeferredValue(${sourceValue});`);
   }
   if (ast.deferredValues?.length > 0) addLine('');
+
+  // Generate useOptimistic hooks
+  for (const optimistic of ast.optimistics || []) {
+    const state = expressionToJS(optimistic.state);
+    const updateFn = expressionToJS(optimistic.updateFn);
+    const addFnName = `add${capitalize(optimistic.name)}`;
+    addLine(`  const [${optimistic.name}, ${addFnName}] = useOptimistic(${state}, ${updateFn});`);
+  }
+  if (ast.optimistics?.length > 0) addLine('');
 
   // Generate useReducer hooks
   for (const reducer of ast.reducers || []) {
