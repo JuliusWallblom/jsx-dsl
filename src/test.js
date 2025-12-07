@@ -27,6 +27,16 @@ test('tokenizes ^ as CALLBACK token', () => {
   assert.strictEqual(tokens[1].value, 'handler');
 });
 
+// Callback parsing
+test('parses ^name = arrowFn as callback declaration', () => {
+  const tokens = tokenize('^handler = () => doSomething');
+  const ast = parse(tokens);
+
+  assert.strictEqual(ast.callbacks.length, 1);
+  assert.strictEqual(ast.callbacks[0].name, 'handler');
+  assert.strictEqual(ast.callbacks[0].value.type, 'ArrowFunction');
+});
+
 // Context tokenization
 test('tokenizes & as CONTEXT token', () => {
   const tokens = tokenize('&theme');

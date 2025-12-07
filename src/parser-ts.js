@@ -10,6 +10,7 @@ export function parse(tokens) {
     states: [],
     reducers: [],
     contexts: [],
+    callbacks: [],
     effects: [],
     memos: [],
     events: {},
@@ -200,6 +201,15 @@ export function parse(tokens) {
     ast.contexts.push({ name, type: typeAnnotation });
   };
 
+  // Parse callback declaration: ^name = arrowFunction
+  const parseCallback = () => {
+    consume(TOKEN_TYPES.CALLBACK);
+    const name = consume(TOKEN_TYPES.IDENTIFIER, 'Expected callback name').value;
+    consume(TOKEN_TYPES.ASSIGN);
+    const value = parseExpression();
+    ast.callbacks.push({ name, value });
+  };
+
   // Parse expressions (simplified for now)
   const parseExpression = () => {
     const token = peek();
@@ -291,6 +301,22 @@ export function parse(tokens) {
       }
 
       return { type: 'Identifier', name };
+    }
+
+    // Handle parenthesized arrow functions: () => body or (a, b) => body
+    if (token?.type === TOKEN_TYPES.LPAREN) {
+      advance();
+      const params = [];
+      while (peek()?.type !== TOKEN_TYPES.RPAREN) {
+        params.push(consume(TOKEN_TYPES.IDENTIFIER, 'Expected parameter name').value);
+        if (peek()?.type === TOKEN_TYPES.COMMA) {
+          advance();
+        }
+      }
+      consume(TOKEN_TYPES.RPAREN);
+      consume(TOKEN_TYPES.ARROW, 'Expected => after parameters');
+      const body = parseExpression();
+      return { type: 'ArrowFunction', params, body };
     }
 
     // Handle arrays
@@ -479,6 +505,9 @@ export function parse(tokens) {
         break;
       case TOKEN_TYPES.CONTEXT:
         parseContext();
+        break;
+      case TOKEN_TYPES.CALLBACK:
+        parseCallback();
         break;
       case TOKEN_TYPES.LT:
         ast.jsx = parseJSX();
