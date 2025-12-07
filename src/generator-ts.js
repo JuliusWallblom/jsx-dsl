@@ -29,6 +29,7 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
   if (ast.states.length > 0) imports.push('useState');
   if (ast.reducers?.length > 0) imports.push('useReducer');
   if (ast.contexts?.length > 0) imports.push('useContext');
+  if (ast.callbacks?.length > 0) imports.push('useCallback');
   if (ast.effects.length > 0) imports.push('useEffect');
   if (ast.memos.length > 0) imports.push('useMemo');
 
@@ -101,6 +102,17 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
     addLine(`  const ${context.name} = useContext(${contextObjectName});`);
   }
   if (ast.contexts?.length > 0) addLine('');
+
+  // Generate useCallback hooks
+  for (const callback of ast.callbacks || []) {
+    const fn = expressionToJS(callback.value);
+    const allDeps = extractDependencies(callback.value.body);
+    // Filter out arrow function parameters from dependencies
+    const params = callback.value.params || [];
+    const deps = allDeps.filter(dep => !params.includes(dep));
+    addLine(`  const ${callback.name} = useCallback(${fn}, [${deps.join(', ')}]);`);
+  }
+  if (ast.callbacks?.length > 0) addLine('');
 
   // Generate memo declarations with types
   for (const memo of ast.memos) {

@@ -115,6 +115,19 @@ function compile(source) {
   return code;
 }
 
+// Code generation for useCallback
+test('generates useCallback hook for cached functions', () => {
+  const code = compile(`
+@count = 0
+^handler = () => count + 1
+<div>{count}</div>
+`);
+
+  assert.ok(code.includes('useCallback'), 'should import useCallback');
+  assert.ok(code.includes('const handler = useCallback('), 'should generate useCallback call');
+  assert.ok(code.includes('[count]'), 'should include dependency array');
+});
+
 // Code generation for useContext
 test('generates useContext hook for context consumption', () => {
   const code = compile(`
