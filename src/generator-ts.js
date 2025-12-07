@@ -42,6 +42,7 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
   if (ast.memos.length > 0) imports.push('useMemo');
   if (ast.deferredValues?.length > 0) imports.push('useDeferredValue');
   if (ast.optimistics?.length > 0) imports.push('useOptimistic');
+  if (ast.ids?.length > 0) imports.push('useId');
 
   const importList = imports.length > 1
     ? `React, { ${imports.slice(1).join(', ')} }`
@@ -103,6 +104,12 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
     addLine(`  const [${state.name}, set${capitalize(state.name)}] = useState${typeAnnotation}(${initialValue});`);
   }
   if (ast.states.length > 0) addLine('');
+
+  // Generate useId hooks
+  for (const id of ast.ids || []) {
+    addLine(`  const ${id.name} = useId();`);
+  }
+  if (ast.ids?.length > 0) addLine('');
 
   // Generate useDeferredValue hooks
   for (const deferred of ast.deferredValues || []) {
