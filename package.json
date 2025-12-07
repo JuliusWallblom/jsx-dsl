@@ -1,17 +1,17 @@
 {
-  "name": "faster-lang",
+  "name": "jsx-dsl",
   "version": "1.1.0",
   "description": "Ultra-minimal DSL that compiles to React with 70% less code. TypeScript, source maps, and VSCode support included.",
   "main": "./src/index.js",
   "type": "module",
   "bin": {
-    "fst": "./src/cli.js"
+    "jsx-dsl": "./src/cli.js"
   },
   "exports": {
     ".": "./src/index.js",
-    "./vite": "./vite-plugin-faster.js",
-    "./webpack": "./fst-loader.js",
-    "./babel": "./babel-plugin-fst.js",
+    "./vite": "./vite-plugin-jsx-dsl.js",
+    "./webpack": "./jsx-dsl-loader.js",
+    "./babel": "./babel-plugin-jsx-dsl.js",
     "./runtime": "./src/runtime.js",
     "./cli": "./src/cli.js"
   },
@@ -25,27 +25,26 @@
     "compiler",
     "jsx",
     "typescript",
-    "faster",
-    "minimal",
-    "jsx.dsl"
+    "jsx-dsl",
+    "minimal"
   ],
-  "author": "Faster Lang Team",
+  "author": "JSX DSL Team",
   "license": "MIT",
-  "homepage": "https://github.com/faster/lang",
+  "homepage": "https://github.com/jsx-dsl/jsx-dsl",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/faster/lang.git"
+    "url": "git+https://github.com/jsx-dsl/jsx-dsl.git"
   },
   "bugs": {
-    "url": "https://github.com/faster/lang/issues"
+    "url": "https://github.com/jsx-dsl/jsx-dsl/issues"
   },
   "files": [
     "src/",
     "examples/",
     "vscode-extension/",
-    "vite-plugin-faster.js",
-    "fst-loader.js",
-    "babel-plugin-fst.js",
+    "vite-plugin-jsx-dsl.js",
+    "jsx-dsl-loader.js",
+    "babel-plugin-jsx-dsl.js",
     "*.md",
     "LICENSE"
   ],

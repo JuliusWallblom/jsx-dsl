@@ -4,7 +4,7 @@ const { parse } = require('./src/parser-extended.js');
 const { generateTypeScript } = require('./src/generator-ts.js');
 const { generate } = require('./src/generator.js');
 
-module.exports = function fstLoader(source) {
+module.exports = function jsxDslLoader(source) {
   const callback = this.async();
 
   try {

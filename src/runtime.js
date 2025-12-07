@@ -8,14 +8,14 @@ import { parse } from './parser-ts.js';
 import { generate } from './generator.js';
 
 /**
- * Compile FST string to React component at runtime
- * @param {string} source - FST source code
+ * Compile JSX DSL string to React component at runtime
+ * @param {string} source - JSX DSL source code
  * @param {string} name - Component name (optional)
  * @returns {React.Component} - Compiled React component
  */
 export function compile(source, name = 'Component') {
   try {
-    // Parse FST syntax
+    // Parse JSX DSL syntax
     const tokens = tokenize(source);
     const ast = parse(tokens);
 
@@ -32,17 +32,17 @@ export function compile(source, name = 'Component') {
 
     return componentFactory(React);
   } catch (error) {
-    console.error('FST compilation error:', error);
+    console.error('JSX DSL compilation error:', error);
     throw error;
   }
 }
 
 /**
- * React hook for using FST syntax inline
- * @param {string} source - FST source code
+ * React hook for using JSX DSL syntax inline
+ * @param {string} source - JSX DSL source code
  * @returns {React.Component} - Compiled React component
  */
-export function useFst(source) {
+export function useJsxDsl(source) {
   const [Component, setComponent] = React.useState(null);
   const [error, setError] = React.useState(null);
 
@@ -60,22 +60,22 @@ export function useFst(source) {
   if (error) {
     return () => React.createElement('div', {
       style: { color: 'red' }
-    }, `FST Error: ${error.message}`);
+    }, `JSX DSL Error: ${error.message}`);
   }
 
   return Component || (() => null);
 }
 
 /**
- * Template tag for FST syntax with syntax highlighting
+ * Template tag for JSX DSL syntax with syntax highlighting
  * @example
- * const Counter = fst`
+ * const Counter = jsxDsl`
  *   @count = 0
  *   !click = count++
  *   <btn @click=click>{count}</btn>
  * `;
  */
-export function fst(strings, ...values) {
+export function jsxDsl(strings, ...values) {
   const source = strings.reduce((acc, str, i) => {
     return acc + str + (values[i] || '');
   }, '');
@@ -85,5 +85,5 @@ export function fst(strings, ...values) {
 
 // Export for use in browser console or development
 if (typeof window !== 'undefined') {
-  window.FastDSL = { compile, useFst, fst };
+  window.JsxDsl = { compile, useJsxDsl, jsxDsl };
 }

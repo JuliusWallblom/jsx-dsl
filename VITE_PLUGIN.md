@@ -1,15 +1,15 @@
-# Vite Plugin for Faster Lang
+# Vite Plugin for JSX DSL
 
-The official Vite plugin for Faster Lang enables seamless integration of `.jsx.dsl` files in your React projects with zero configuration.
+The official Vite plugin for JSX DSL enables seamless integration of `.jsx.dsl` files in your React projects with zero configuration.
 
 ## Installation
 
 ```bash
-npm install faster-lang
+npm install jsx-dsl
 # or
-yarn add faster-lang
+yarn add jsx-dsl
 # or
-pnpm add faster-lang
+pnpm add jsx-dsl
 ```
 
 ## Quick Setup
@@ -20,12 +20,12 @@ pnpm add faster-lang
 // vite.config.js
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import faster from 'faster-lang/vite';
+import jsxDsl from 'jsx-dsl/vite';
 
 export default defineConfig({
   plugins: [
     react(),
-    faster() // Add the Faster Lang plugin
+    jsxDsl() // Add the JSX DSL plugin
   ]
 });
 ```
@@ -46,7 +46,7 @@ declare module '*.jsx.dsl' {
 
 Create `src/components/Counter.jsx.dsl`:
 
-```fst
+```jsx-dsl
 :label::string
 @count::number = 0
 !increment = count++
@@ -82,7 +82,7 @@ export default App;
 
 ```js
 // vite.config.js
-faster({
+jsxDsl({
   // Generate TypeScript output (default: true)
   typescript: true,
 
@@ -122,15 +122,15 @@ Clear error messages with file locations and helpful debugging info.
 
 ## Example Projects
 
-### React + TypeScript + Faster
+### React + TypeScript + JSX DSL
 
 ```bash
 # Create new Vite project
 npm create vite@latest my-app -- --template react-ts
 cd my-app
 
-# Install Faster Lang
-npm install faster-lang
+# Install JSX DSL
+npm install jsx-dsl
 
 # Configure (see setup above)
 ```
@@ -141,8 +141,8 @@ npm install faster-lang
 my-app/
 ├── src/
 │   ├── components/
-│   │   ├── Header.jsx.dsl       # Faster component
-│   │   ├── Counter.jsx.dsl      # Faster component
+│   │   ├── Header.jsx.dsl       # JSX DSL component
+│   │   ├── Counter.jsx.dsl      # JSX DSL component
 │   │   └── Layout.tsx       # Regular React
 │   ├── App.tsx
 │   ├── main.tsx
@@ -176,8 +176,8 @@ export function Layout({ children }: LayoutProps) {
 }
 ```
 
-```fst
-// Header.jsx.dsl - Faster component
+```jsx-dsl
+// Header.jsx.dsl - JSX DSL component
 :title::string
 @isMenuOpen::boolean = false
 !toggleMenu = isMenuOpen = !isMenuOpen
@@ -195,12 +195,12 @@ export function Layout({ children }: LayoutProps) {
 // vite.config.js
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import faster from 'faster-lang/vite';
+import jsxDsl from 'jsx-dsl/vite';
 
 export default defineConfig(({ command, mode }) => ({
   plugins: [
     react(),
-    faster({
+    jsxDsl({
       // Disable source maps in production
       sourceMap: mode !== 'production',
 
@@ -264,7 +264,7 @@ Enable debug logging:
 
 ```js
 // vite.config.js
-faster({
+jsxDsl({
   // ... other options
   debug: true // Enable debug logging
 })
@@ -272,10 +272,10 @@ faster({
 
 ### VSCode Integration
 
-For the best development experience, install the Faster Lang VSCode extension:
+For the best development experience, install the JSX DSL VSCode extension:
 
 ```bash
-code --install-extension faster-lang-vscode
+code --install-extension jsx-dsl-vscode
 ```
 
 This provides:
@@ -297,8 +297,8 @@ This provides:
 
 ## Contributing
 
-Found a bug or want to contribute? Check out our [GitHub repository](https://github.com/faster/lang).
+Found a bug or want to contribute? Check out our [GitHub repository](https://github.com/jsx-dsl/jsx-dsl).
 
 ## License
 
-MIT © Faster Lang Contributors
+MIT © JSX DSL Contributors

@@ -1,11 +1,11 @@
-# React Micro DSL - VSCode Extension
+# JSX DSL - VSCode Extension
 
-Provides syntax highlighting, snippets, and IntelliSense for React Micro DSL (.rdsl) files.
+Provides syntax highlighting, snippets, and IntelliSense for JSX DSL (.jsx.dsl) files.
 
 ## Features
 
 ### Syntax Highlighting
-- Full syntax highlighting for RDSL files
+- Full syntax highlighting for JSX DSL files
 - Colored symbols for state (`@`), props (`:`), effects (`$`), memos (`%`), and events (`!`)
 - JSX/HTML tag highlighting
 - TypeScript type annotations support
@@ -30,7 +30,7 @@ Provides syntax highlighting, snippets, and IntelliSense for React Micro DSL (.r
 - Quote auto-pairing
 
 ### Commands
-- `Compile RDSL to React` (Ctrl+Shift+R / Cmd+Shift+R) - Compiles current file
+- `Compile JSX DSL to React` (Ctrl+Shift+R / Cmd+Shift+R) - Compiles current file
 
 ## Installation
 
@@ -49,7 +49,7 @@ Provides syntax highlighting, snippets, and IntelliSense for React Micro DSL (.r
 
 ## Usage
 
-1. Create a new file with `.rdsl` extension
+1. Create a new file with `.jsx.dsl` extension
 2. Start typing - the extension will provide syntax highlighting automatically
 3. Use snippets for faster development
 4. Press Ctrl+Shift+R (Cmd+Shift+R on Mac) to compile to React
@@ -57,7 +57,7 @@ Provides syntax highlighting, snippets, and IntelliSense for React Micro DSL (.r
 ## Examples
 
 ### Simple Counter
-```rdsl
+```jsx-dsl
 :label
 @count = 0
 !click = count++
@@ -65,7 +65,7 @@ Provides syntax highlighting, snippets, and IntelliSense for React Micro DSL (.r
 ```
 
 ### TypeScript Support
-```rdsl
+```jsx-dsl
 :name::string
 @value::number = 42
 %doubled::number = value * 2
@@ -75,8 +75,8 @@ Provides syntax highlighting, snippets, and IntelliSense for React Micro DSL (.r
 ## Development
 
 To modify the extension:
-1. Edit the grammar in `syntaxes/rdsl.tmLanguage.json`
-2. Add new snippets in `snippets/rdsl.json`
+1. Edit the grammar in `syntaxes/jsx-dsl.tmLanguage.json`
+2. Add new snippets in `snippets/jsx-dsl.json`
 3. Reload VS Code to test changes
 
 ## License

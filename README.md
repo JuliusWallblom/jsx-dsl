@@ -1,4 +1,4 @@
-# Fast DSL
+# JSX DSL
 
 An ultra-minimal DSL that compiles to React code with state, effects, memoization, and more. Now with **TypeScript support**, **source maps**, and **VSCode integration**!
 
@@ -29,24 +29,24 @@ npm install
 
 ```bash
 # Compile to JavaScript
-./fst input.jsx.dsl
+jsx-dsl input.jsx.dsl
 
 # Compile to TypeScript with source maps
-./fst input.jsx.dsl --typescript --sourcemap
+jsx-dsl input.jsx.dsl --typescript --sourcemap
 
 # Watch mode with auto-recompilation
-./fst input.jsx.dsl --watch
+jsx-dsl input.jsx.dsl --watch
 
 # Show compilation statistics
-./fst input.jsx.dsl --stats
+jsx-dsl input.jsx.dsl --stats
 
 # Show examples
-./fst examples
+jsx-dsl examples
 ```
 
 ### VSCode Extension
 
-1. Install the extension: `code --install-extension vscode-extension/fast-dsl-0.1.0.vsix`
+1. Install the extension: `code --install-extension vscode-extension/jsx-dsl-0.1.0.vsix`
 2. Open any `.jsx.dsl` file
 3. Enjoy syntax highlighting, auto-complete, and snippets
 4. Press `Cmd+Shift+R` (Mac) or `Ctrl+Shift+R` (Windows/Linux) to compile
@@ -55,7 +55,7 @@ npm install
 
 ### Counter Component
 
-```fst
+```jsx-dsl
 :label
 @count = 0
 $log(count)
@@ -87,7 +87,7 @@ export default Component;
 
 ### Todo List
 
-```fst
+```jsx-dsl
 @todos = []
 @input = ""
 !add = todos.push(input)
@@ -105,7 +105,7 @@ export default Component;
 
 ### Advanced Example with Memoization
 
-```fst
+```jsx-dsl
 :title
 @count = 0
 @multiplier = 2
@@ -128,7 +128,7 @@ $log(result)
 
 ### TypeScript Example
 
-```fst
+```jsx-dsl
 :name::string
 :age::number
 @items::string[] = []

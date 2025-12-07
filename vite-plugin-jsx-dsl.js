@@ -1,4 +1,4 @@
-// Vite plugin for Faster Lang (.jsx.dsl files)
+// Vite plugin for JSX DSL (.jsx.dsl files)
 import path from 'path';
 import { transform as esbuildTransform } from 'esbuild';
 import { tokenize } from './src/tokenizer-ts.js';
@@ -6,10 +6,10 @@ import { parse } from './src/parser-ts.js';
 import { generateTypeScript } from './src/generator-ts.js';
 import { generate } from './src/generator.js';
 
-const FST_FILE_REGEX = /\.jsx\.dsl$/;
+const JSX_DSL_FILE_REGEX = /\.jsx\.dsl$/;
 
 /**
- * Vite plugin for Faster Lang
+ * Vite plugin for JSX DSL
  * @param {Object} options - Plugin options
  * @param {boolean} options.typescript - Generate TypeScript output (default: true)
  * @param {boolean} options.sourceMap - Generate source maps (default: true)
@@ -18,19 +18,19 @@ const FST_FILE_REGEX = /\.jsx\.dsl$/;
  * @param {string} options.exclude - Exclude pattern
  * @returns {import('vite').Plugin} Vite plugin
  */
-export default function fasterPlugin(options = {}) {
+export default function jsxDslPlugin(options = {}) {
   const {
     typescript = true,
     sourceMap = true,
     hmr = true,
-    include = FST_FILE_REGEX,
+    include = JSX_DSL_FILE_REGEX,
     exclude
   } = options;
 
   let isProduction = false;
 
   return {
-    name: 'vite-plugin-faster',
+    name: 'vite-plugin-jsx-dsl',
     enforce: 'pre', // Run before other plugins (especially React)
 
     configResolved(config) {
@@ -39,7 +39,7 @@ export default function fasterPlugin(options = {}) {
 
     // Handle .jsx.dsl file resolution
     resolveId(id, importer) {
-      if (FST_FILE_REGEX.test(id)) {
+      if (JSX_DSL_FILE_REGEX.test(id)) {
         return path.resolve(path.dirname(importer || ''), id);
       }
     },
@@ -47,7 +47,7 @@ export default function fasterPlugin(options = {}) {
     // Transform .jsx.dsl files
     async transform(code, id) {
       // Check if this is a .jsx.dsl file
-      if (!FST_FILE_REGEX.test(id)) return;
+      if (!JSX_DSL_FILE_REGEX.test(id)) return;
 
       // Apply include/exclude filters
       if (include && !include.test(id)) return;
@@ -83,7 +83,7 @@ export default function fasterPlugin(options = {}) {
 
         // Add HMR support in development
         if (hmr && !isProduction) {
-          output += `\n\n// HMR for Faster Lang
+          output += `\n\n// HMR for JSX DSL
 if (import.meta.hot) {
   import.meta.hot.accept((newModule) => {
     // Force re-render when .jsx.dsl file changes
@@ -111,16 +111,16 @@ if (import.meta.hot) {
         };
       } catch (error) {
         // Provide helpful error messages
-        console.error(`Faster Lang compilation error in ${id}:`, error.message);
+        console.error(`JSX DSL compilation error in ${id}:`, error.message);
 
         // Throw a simple error to avoid Vite's complex error handling
-        throw new Error(`Faster Lang compilation failed: ${error.message}`);
+        throw new Error(`JSX DSL compilation failed: ${error.message}`);
       }
     },
 
     // Handle HMR updates
     handleHotUpdate(ctx) {
-      if (FST_FILE_REGEX.test(ctx.file)) {
+      if (JSX_DSL_FILE_REGEX.test(ctx.file)) {
         // Force update all modules that import this .jsx.dsl file
         const affectedModules = new Set();
 
@@ -142,7 +142,7 @@ if (import.meta.hot) {
     configureServer(server) {
       // Middleware to handle .jsx.dsl file requests
       server.middlewares.use((req, res, next) => {
-        if (req.url && FST_FILE_REGEX.test(req.url)) {
+        if (req.url && JSX_DSL_FILE_REGEX.test(req.url)) {
           // Set appropriate headers for .jsx.dsl files
           res.setHeader('Content-Type', 'application/javascript');
         }
@@ -153,7 +153,7 @@ if (import.meta.hot) {
     // Build hooks
     buildStart() {
       // Log that the plugin is active
-      this.info('Faster Lang plugin active - compiling .jsx.dsl files');
+      this.info('JSX DSL plugin active - compiling .jsx.dsl files');
     },
 
     // Generate bundle
@@ -162,7 +162,7 @@ if (import.meta.hot) {
       for (const [fileName, chunk] of Object.entries(bundle)) {
         if (chunk.type === 'chunk' && chunk.facadeModuleId?.endsWith('.jsx.dsl')) {
           // Add metadata about the original .jsx.dsl file
-          chunk.fstOriginal = chunk.facadeModuleId;
+          chunk.jsxDslOriginal = chunk.facadeModuleId;
         }
       }
     }
@@ -170,7 +170,7 @@ if (import.meta.hot) {
 }
 
 // Named export for better tree-shaking
-export { fasterPlugin };
+export { jsxDslPlugin };
 
 // CommonJS compatibility
-fasterPlugin.default = fasterPlugin;
+jsxDslPlugin.default = jsxDslPlugin;

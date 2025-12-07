@@ -1,5 +1,5 @@
 // Babel plugin for inline .jsx.dsl transformation
-module.exports = function babelPluginFst() {
+module.exports = function babelPluginJsxDsl() {
   return {
     visitor: {
       ImportDeclaration(path, state) {

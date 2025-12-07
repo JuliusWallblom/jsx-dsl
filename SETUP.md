@@ -1,4 +1,4 @@
-# Getting Started with Fast DSL (.jsx.dsl)
+# Getting Started with JSX DSL (.jsx.dsl)
 
 ## Quick Start for New React Projects
 
@@ -19,11 +19,11 @@ npm install fast-dsl
 // vite.config.js
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import fasterPlugin from 'faster-lang/vite';
+import jsxDslPlugin from 'jsx-dsl/vite';
 
 export default defineConfig({
   plugins: [
-    fasterPlugin({ typescript: true }),
+    jsxDslPlugin({ typescript: true }),
     react()
   ]
 });
@@ -36,8 +36,8 @@ export default defineConfig({
 npx create-react-app my-app --template typescript
 cd my-app
 
-# Install Fast DSL
-npm install fast-dsl
+# Install JSX DSL
+npm install jsx-dsl
 
 # Eject to customize webpack (required)
 npm run eject
@@ -55,7 +55,7 @@ module.exports = {
       {
         test: /\.jsx\.dsl$/,
         use: {
-          loader: 'fast-dsl/fst-loader',
+          loader: 'jsx-dsl/webpack',
           options: {
             typescript: true
           }
@@ -73,8 +73,8 @@ module.exports = {
 npx create-next-app@latest my-app --typescript
 cd my-app
 
-# Install Fast DSL
-npm install fast-dsl
+# Install JSX DSL
+npm install jsx-dsl
 
 # Add to next.config.js
 ```
@@ -86,7 +86,7 @@ module.exports = {
     config.module.rules.push({
       test: /\.jsx\.dsl$/,
       use: {
-        loader: 'fast-dsl/fst-loader',
+        loader: 'jsx-dsl/webpack',
         options: {
           typescript: true
         }
@@ -101,7 +101,7 @@ module.exports = {
 
 ### 1. Create a component file: `Counter.jsx.dsl`
 
-```fst
+```jsx-dsl
 :label::string
 @count::number = 0
 !increment = count++
@@ -149,7 +149,7 @@ declare module '*.jsx.dsl' {
 ### 1. Install VSCode Extension
 
 ```bash
-code --install-extension path/to/fast-dsl-0.1.0.vsix
+code --install-extension path/to/jsx-dsl-0.1.0.vsix
 ```
 
 ### 2. Configure VSCode
@@ -176,7 +176,7 @@ With Vite, HMR works automatically for `.jsx.dsl` files:
 // vite.config.js
 export default {
   plugins: [
-    fstPlugin({
+    jsxDslPlugin({
       typescript: true,
       hmr: true // Enable hot reload
     })
@@ -189,21 +189,21 @@ export default {
 ### Install from npm (once published):
 
 ```bash
-npm install fast-dsl
+npm install jsx-dsl
 # or
-yarn add fast-dsl
+yarn add jsx-dsl
 # or
-pnpm add fast-dsl
+pnpm add jsx-dsl
 ```
 
 ### Or install from local directory:
 
 ```bash
-# In the fast-dsl directory
+# In the jsx-dsl directory
 npm link
 
 # In your React project
-npm link fast-dsl
+npm link jsx-dsl
 ```
 
 ## Build-time vs Runtime
@@ -216,7 +216,7 @@ npm link fast-dsl
 
 ### Runtime Compilation (Experimental)
 ```javascript
-import { compile } from 'fast-dsl/runtime';
+import { compile } from 'jsx-dsl/runtime';
 
 const Counter = compile(`
   @count = 0
@@ -231,12 +231,12 @@ const Counter = compile(`
 my-app/
 ├── src/
 │   ├── components/
-│   │   ├── Header.jsx.dsl      # Fast DSL component
+│   │   ├── Header.jsx.dsl      # JSX DSL component
 │   │   ├── Footer.tsx          # Regular TypeScript
-│   │   └── Button.jsx.dsl      # Fast DSL component
+│   │   └── Button.jsx.dsl      # JSX DSL component
 │   ├── App.tsx
 │   └── main.tsx
-├── fst.d.ts                 # TypeScript declarations
+├── jsx-dsl.d.ts             # TypeScript declarations
 ├── vite.config.js           # Vite configuration
 └── package.json
 ```
@@ -301,14 +301,14 @@ function App() {
 
 Clone the examples:
 ```bash
-git clone https://github.com/yourusername/fst-examples
-cd fst-examples
+git clone https://github.com/jsx-dsl/jsx-dsl-examples
+cd jsx-dsl-examples
 npm install
 npm run dev
 ```
 
 ## Support
 
-- GitHub Issues: [Report bugs](https://github.com/yourusername/fast-dsl)
-- Documentation: [Full docs](https://fast-dsl.dev)
-- Discord: [Join community](https://discord.gg/fast-dsl)
+- GitHub Issues: [Report bugs](https://github.com/jsx-dsl/jsx-dsl)
+- Documentation: [Full docs](https://jsx-dsl.dev)
+- Discord: [Join community](https://discord.gg/jsx-dsl)

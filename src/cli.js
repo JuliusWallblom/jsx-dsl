@@ -117,7 +117,7 @@ async function watch(inputFile, options) {
 }
 
 program
-  .name('fst')
+  .name('jsx-dsl')
   .description('Fast DSL Compiler with TypeScript and Source Map support')
   .version('2.0.0')
   .argument('<input>', 'Input DSL file (.jsx.dsl)')

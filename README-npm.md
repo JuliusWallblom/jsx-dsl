@@ -1,15 +1,15 @@
-# faster-lang
+# jsx-dsl
 
 > Write React components with 70% less code. A minimal DSL that compiles to React with TypeScript support.
 
-[![npm version](https://img.shields.io/npm/v/faster-lang.svg)](https://www.npmjs.com/package/faster-lang)
+[![npm version](https://img.shields.io/npm/v/jsx-dsl.svg)](https://www.npmjs.com/package/jsx-dsl)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## What is Faster?
+## What is JSX DSL?
 
-Faster is a minimal DSL that compiles to React. Write components in `.jsx.dsl` files with ultra-compact syntax:
+JSX DSL is a minimal DSL that compiles to React. Write components in `.jsx.dsl` files with ultra-compact syntax:
 
-```fst
+```jsx-dsl
 :name::string
 @count = 0
 !increment = count++
@@ -25,11 +25,11 @@ This compiles to full React with TypeScript, hooks, and all the features you nee
 ## Installation
 
 ```bash
-npm install faster-lang
+npm install jsx-dsl
 # or
-yarn add faster-lang
+yarn add jsx-dsl
 # or
-pnpm add faster-lang
+pnpm add jsx-dsl
 ```
 
 ## Quick Start
@@ -42,10 +42,10 @@ pnpm add faster-lang
 // vite.config.js
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import fst from 'faster-lang/vite';
+import jsxDsl from 'jsx-dsl/vite';
 
 export default defineConfig({
-  plugins: [react(), fst()]
+  plugins: [react(), jsxDsl()]
 });
 ```
 
@@ -58,7 +58,7 @@ module.exports = {
     rules: [
       {
         test: /\.jsx\.dsl$/,
-        use: 'faster-lang/webpack'
+        use: 'jsx-dsl/webpack'
       }
     ]
   }
@@ -69,7 +69,7 @@ module.exports = {
 
 Create `Counter.jsx.dsl`:
 
-```fst
+```jsx-dsl
 :label::string
 @count::number = 0
 !click = count++
@@ -110,7 +110,7 @@ function App() {
 
 ### Todo List
 
-```fst
+```jsx-dsl
 @todos::string[] = []
 @input::string = ""
 !add = todos.push(input)
@@ -128,7 +128,7 @@ function App() {
 
 ### With Effects and Memos
 
-```fst
+```jsx-dsl
 :userId::number
 @data = null
 @loading = true
@@ -146,16 +146,16 @@ $fetch(userId)
 
 ```bash
 # Compile a single file
-npx fst input.jsx.dsl
+npx jsx-dsl input.jsx.dsl
 
 # Watch mode
-npx fst input.jsx.dsl --watch
+npx jsx-dsl input.jsx.dsl --watch
 
 # TypeScript output
-npx fst input.jsx.dsl --typescript
+npx jsx-dsl input.jsx.dsl --typescript
 
 # With source maps
-npx fst input.jsx.dsl --typescript --sourcemap
+npx jsx-dsl input.jsx.dsl --typescript --sourcemap
 ```
 
 ## VSCode Extension
@@ -163,7 +163,7 @@ npx fst input.jsx.dsl --typescript --sourcemap
 Install for syntax highlighting and IntelliSense:
 
 ```bash
-code --install-extension faster-lang
+code --install-extension jsx-dsl
 ```
 
 ## Runtime API (Development)
@@ -171,7 +171,7 @@ code --install-extension faster-lang
 For prototyping without build tools:
 
 ```jsx
-import { compile } from 'faster-lang/runtime';
+import { compile } from 'jsx-dsl/runtime';
 
 const Counter = compile(`
   @count = 0
@@ -202,7 +202,7 @@ Coming from React? Here's how to convert:
 const [count, setCount] = useState(0);
 const increment = () => setCount(count + 1);
 
-// Faster
+// JSX DSL
 @count = 0
 !increment = count++
 ```
@@ -215,15 +215,15 @@ const increment = () => setCount(count + 1);
 
 ## Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](https://github.com/faster/lang/blob/main/CONTRIBUTING.md)
+We welcome contributions! See [CONTRIBUTING.md](https://github.com/jsx-dsl/jsx-dsl/blob/main/CONTRIBUTING.md)
 
 ## License
 
-MIT © Faster Lang Contributors
+MIT © JSX DSL Contributors
 
 ## Links
 
-- [Documentation](https://faster-lang.dev)
-- [GitHub](https://github.com/faster/lang)
-- [Discord](https://discord.gg/faster-lang)
-- [Examples](https://github.com/faster/lang/tree/main/examples)
+- [Documentation](https://jsx-dsl.dev)
+- [GitHub](https://github.com/jsx-dsl/jsx-dsl)
+- [Discord](https://discord.gg/jsx-dsl)
+- [Examples](https://github.com/jsx-dsl/jsx-dsl/tree/main/examples)

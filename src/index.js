@@ -1,4 +1,4 @@
-// Main entry point for @faster/lang npm package
+// Main entry point for jsx-dsl npm package
 
 // Core compiler functions
 export { tokenize } from './tokenizer-ts.js';
@@ -7,7 +7,7 @@ export { generate } from './generator.js';
 export { generateTypeScript } from './generator-ts.js';
 
 // Runtime compiler for development
-export { compile, useFst, fst } from './runtime.js';
+export { compile, useJsxDsl, jsxDsl } from './runtime.js';
 
 // Re-export token types for external tooling
 export { TOKEN_TYPES } from './tokenizer-ts.js';
