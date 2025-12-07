@@ -21,6 +21,9 @@ export const TOKEN_TYPES = {
   // Ref
   REF: 'REF',               // # for useRef
 
+  // Handle
+  HANDLE: 'HANDLE',         // ~ for useImperativeHandle
+
   // Operators
   ASSIGN: 'ASSIGN',         // =
   PLUS: 'PLUS',             // +
@@ -156,6 +159,12 @@ export function tokenize(input) {
     if (char === '#') {
       advance();
       addToken(TOKEN_TYPES.REF);
+      continue;
+    }
+
+    if (char === '~') {
+      advance();
+      addToken(TOKEN_TYPES.HANDLE);
       continue;
     }
 
