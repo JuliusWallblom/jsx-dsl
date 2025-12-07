@@ -44,6 +44,7 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
   if (ast.optimistics?.length > 0) imports.push('useOptimistic');
   if (ast.ids?.length > 0) imports.push('useId');
   if (ast.syncs?.length > 0) imports.push('useSyncExternalStore');
+  if (ast.actionStates?.length > 0) imports.push('useActionState');
 
   const importList = imports.length > 1
     ? `React, { ${imports.slice(1).join(', ')} }`
@@ -140,6 +141,16 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
     }
   }
   if (ast.syncs?.length > 0) addLine('');
+
+  // Generate useActionState hooks
+  for (const actionState of ast.actionStates || []) {
+    const actionFn = expressionToJS(actionState.actionFn);
+    const initialState = expressionToJS(actionState.initialState);
+    const formActionName = `${actionState.name}Action`;
+    const isPendingName = `isPending${capitalize(actionState.name)}`;
+    addLine(`  const [${actionState.name}, ${formActionName}, ${isPendingName}] = useActionState(${actionFn}, ${initialState});`);
+  }
+  if (ast.actionStates?.length > 0) addLine('');
 
   // Generate useReducer hooks
   for (const reducer of ast.reducers || []) {
