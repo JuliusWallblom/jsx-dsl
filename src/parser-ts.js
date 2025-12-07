@@ -19,6 +19,7 @@ export function parse(tokens) {
     callbacks: [],
     refs: [],
     handles: [],
+    ids: [],
     effects: [],
     layoutEffects: [],
     memos: [],
@@ -298,6 +299,13 @@ export function parse(tokens) {
     consume(TOKEN_TYPES.ASSIGN);
     const value = parseExpression();
     ast.handles.push({ name, value });
+  };
+
+  // Parse id declaration: *name
+  const parseId = () => {
+    consume(TOKEN_TYPES.ID);
+    const name = consume(TOKEN_TYPES.IDENTIFIER, 'Expected id name').value;
+    ast.ids.push({ name });
   };
 
   // Parse expressions (simplified for now)
@@ -607,6 +615,9 @@ export function parse(tokens) {
         break;
       case TOKEN_TYPES.HANDLE:
         parseHandle();
+        break;
+      case TOKEN_TYPES.ID:
+        parseId();
         break;
       case TOKEN_TYPES.LT:
         ast.jsx = parseJSX();

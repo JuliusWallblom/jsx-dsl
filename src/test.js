@@ -378,6 +378,15 @@ test('tokenizes * as ID token', () => {
   assert.strictEqual(tokens[1].value, 'formId');
 });
 
+// ID parsing
+test('parses *name as id declaration', () => {
+  const tokens = tokenize('*formId');
+  const ast = parse(tokens);
+
+  assert.strictEqual(ast.ids.length, 1);
+  assert.strictEqual(ast.ids[0].name, 'formId');
+});
+
 // Summary
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);
