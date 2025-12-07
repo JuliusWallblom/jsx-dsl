@@ -28,6 +28,7 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
   const imports = ['React'];
   if (ast.states.length > 0) imports.push('useState');
   if (ast.reducers?.length > 0) imports.push('useReducer');
+  if (ast.contexts?.length > 0) imports.push('useContext');
   if (ast.effects.length > 0) imports.push('useEffect');
   if (ast.memos.length > 0) imports.push('useMemo');
 
@@ -86,6 +87,13 @@ export function generateTypeScript(ast, sourceFile, options = {}) {
     addLine(`  const [${reducer.name}, ${dispatchName}] = useReducer(${reducerName}, ${initialValue});`);
   }
   if (ast.reducers?.length > 0) addLine('');
+
+  // Generate useContext hooks
+  for (const context of ast.contexts || []) {
+    const contextObjectName = `${capitalize(context.name)}Context`;
+    addLine(`  const ${context.name} = useContext(${contextObjectName});`);
+  }
+  if (ast.contexts?.length > 0) addLine('');
 
   // Generate memo declarations with types
   for (const memo of ast.memos) {

@@ -96,6 +96,17 @@ function compile(source) {
   return code;
 }
 
+// Code generation for useContext
+test('generates useContext hook for context consumption', () => {
+  const code = compile(`
+&theme
+<div>{theme}</div>
+`);
+
+  assert.ok(code.includes('useContext'), 'should import useContext');
+  assert.ok(code.includes('const theme = useContext('), 'should generate useContext call');
+});
+
 // Code generation for useReducer
 test('generates useReducer hook and reducer function', () => {
   const code = compile(`
