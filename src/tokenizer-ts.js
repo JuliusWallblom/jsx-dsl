@@ -1,12 +1,49 @@
-import { TOKEN_TYPES as BASE_TOKEN_TYPES, tokenize as baseTokenize } from './tokenizer.js';
-
-// Extended token types for TypeScript support
+// Token types for JSX DSL
 export const TOKEN_TYPES = {
-  ...BASE_TOKEN_TYPES,
-  COLON_TYPE: 'COLON_TYPE',  // :: for type annotations
-  QUESTION: 'QUESTION',       // ? for optional types
-  PIPE: 'PIPE',              // | for union types
-  AMPERSAND: 'AMPERSAND',    // & for intersection types
+  // DSL symbols
+  STATE: 'STATE',           // @
+  EFFECT: 'EFFECT',         // $
+  MEMO: 'MEMO',             // %
+  PROP: 'PROP',             // :
+  EVENT: 'EVENT',           // !
+
+  // TypeScript support
+  COLON_TYPE: 'COLON_TYPE', // :: for type annotations
+  QUESTION: 'QUESTION',     // ? for optional types
+  PIPE: 'PIPE',             // | for union types
+  AMPERSAND: 'AMPERSAND',   // & for intersection types
+
+  // Operators
+  ASSIGN: 'ASSIGN',         // =
+  PLUS: 'PLUS',             // +
+  MINUS: 'MINUS',           // -
+  MULTIPLY: 'MULTIPLY',     // *
+  SLASH: 'SLASH',           // /
+  INCREMENT: 'INCREMENT',   // ++
+  DECREMENT: 'DECREMENT',   // --
+  PLUS_ASSIGN: 'PLUS_ASSIGN', // +=
+  ARROW: 'ARROW',           // =>
+
+  // Punctuation
+  DOT: 'DOT',               // .
+  COMMA: 'COMMA',           // ,
+  LPAREN: 'LPAREN',         // (
+  RPAREN: 'RPAREN',         // )
+  LBRACE: 'LBRACE',         // {
+  RBRACE: 'RBRACE',         // }
+  LBRACKET: 'LBRACKET',     // [
+  RBRACKET: 'RBRACKET',     // ]
+  LT: 'LT',                 // <
+  GT: 'GT',                 // >
+
+  // Literals
+  STRING: 'STRING',
+  NUMBER: 'NUMBER',
+  IDENTIFIER: 'IDENTIFIER',
+
+  // Control
+  NEWLINE: 'NEWLINE',
+  EOF: 'EOF',
 };
 
 export function tokenize(input) {
