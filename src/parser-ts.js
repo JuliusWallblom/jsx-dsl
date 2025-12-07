@@ -13,6 +13,7 @@ export function parse(tokens) {
     transitions: [],
     contexts: [],
     callbacks: [],
+    refs: [],
     effects: [],
     memos: [],
     events: {},
@@ -219,6 +220,21 @@ export function parse(tokens) {
     consume(TOKEN_TYPES.ASSIGN);
     const value = parseExpression();
     ast.callbacks.push({ name, value });
+  };
+
+  // Parse ref declaration: #name or #name::Type or #name = value
+  const parseRef = () => {
+    consume(TOKEN_TYPES.REF);
+    const name = consume(TOKEN_TYPES.IDENTIFIER, 'Expected ref name').value;
+    const typeAnnotation = parseTypeAnnotation();
+
+    let initialValue = null;
+    if (peek()?.type === TOKEN_TYPES.ASSIGN) {
+      advance();
+      initialValue = parseExpression();
+    }
+
+    ast.refs.push({ name, type: typeAnnotation, initialValue });
   };
 
   // Parse expressions (simplified for now)
@@ -519,6 +535,9 @@ export function parse(tokens) {
         break;
       case TOKEN_TYPES.CALLBACK:
         parseCallback();
+        break;
+      case TOKEN_TYPES.REF:
+        parseRef();
         break;
       case TOKEN_TYPES.LT:
         ast.jsx = parseJSX();

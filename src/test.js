@@ -27,6 +27,37 @@ test('tokenizes # as REF token', () => {
   assert.strictEqual(tokens[1].value, 'inputRef');
 });
 
+// Ref parsing
+test('parses #refName as ref declaration', () => {
+  const tokens = tokenize('#inputRef');
+  const ast = parse(tokens);
+
+  assert.strictEqual(ast.refs.length, 1);
+  assert.strictEqual(ast.refs[0].name, 'inputRef');
+  assert.strictEqual(ast.refs[0].type, null);
+  assert.strictEqual(ast.refs[0].initialValue, null);
+});
+
+test('parses #refName::Type with type annotation', () => {
+  const tokens = tokenize('#inputRef::HTMLInputElement');
+  const ast = parse(tokens);
+
+  assert.strictEqual(ast.refs.length, 1);
+  assert.strictEqual(ast.refs[0].name, 'inputRef');
+  assert.strictEqual(ast.refs[0].type.type, 'SimpleType');
+  assert.strictEqual(ast.refs[0].type.name, 'HTMLInputElement');
+});
+
+test('parses #refName = initialValue with initial value', () => {
+  const tokens = tokenize('#count = 0');
+  const ast = parse(tokens);
+
+  assert.strictEqual(ast.refs.length, 1);
+  assert.strictEqual(ast.refs[0].name, 'count');
+  assert.strictEqual(ast.refs[0].initialValue.type, 'Literal');
+  assert.strictEqual(ast.refs[0].initialValue.value, 0);
+});
+
 // Callback tokenization
 test('tokenizes ^ as CALLBACK token', () => {
   const tokens = tokenize('^handler');
