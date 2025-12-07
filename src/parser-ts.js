@@ -2,6 +2,7 @@ import { TOKEN_TYPES } from './tokenizer-ts.js';
 
 const MODIFIER_REDUCER = 'reducer';
 const MODIFIER_TRANSITION = 'transition';
+const MODIFIER_DEFERRED = 'deferred';
 
 export function parse(tokens) {
   let position = 0;
@@ -11,6 +12,7 @@ export function parse(tokens) {
     states: [],
     reducers: [],
     transitions: [],
+    deferredValues: [],
     contexts: [],
     callbacks: [],
     refs: [],
@@ -131,6 +133,16 @@ export function parse(tokens) {
       advance(); // consume :
       advance(); // consume 'transition'
       ast.transitions.push({ name });
+      return;
+    }
+
+    // Check for :deferred modifier
+    if (peek()?.type === TOKEN_TYPES.PROP && peek(1)?.type === TOKEN_TYPES.IDENTIFIER && peek(1)?.value === MODIFIER_DEFERRED) {
+      advance(); // consume :
+      advance(); // consume 'deferred'
+      consume(TOKEN_TYPES.ASSIGN);
+      const sourceValue = parseExpression();
+      ast.deferredValues.push({ name, sourceValue });
       return;
     }
 

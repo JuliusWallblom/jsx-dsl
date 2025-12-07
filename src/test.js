@@ -322,6 +322,17 @@ $$measure(element)
   assert.ok(code.includes('measure(element)'), 'should call the function with args');
 });
 
+// Deferred value modifier parsing
+test('parses @name:deferred = value as deferred value declaration', () => {
+  const tokens = tokenize('@deferredQuery:deferred = query');
+  const ast = parse(tokens);
+
+  assert.strictEqual(ast.deferredValues.length, 1);
+  assert.strictEqual(ast.deferredValues[0].name, 'deferredQuery');
+  assert.strictEqual(ast.deferredValues[0].sourceValue.type, 'Identifier');
+  assert.strictEqual(ast.deferredValues[0].sourceValue.name, 'query');
+});
+
 // Summary
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);
