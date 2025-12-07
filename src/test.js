@@ -18,6 +18,46 @@ function test(name, fn) {
   }
 }
 
+// Ref tokenization
+test('tokenizes # as REF token', () => {
+  const tokens = tokenize('#inputRef');
+
+  assert.strictEqual(tokens[0].type, 'REF');
+  assert.strictEqual(tokens[1].type, 'IDENTIFIER');
+  assert.strictEqual(tokens[1].value, 'inputRef');
+});
+
+// Ref parsing
+test('parses #refName as ref declaration', () => {
+  const tokens = tokenize('#inputRef');
+  const ast = parse(tokens);
+
+  assert.strictEqual(ast.refs.length, 1);
+  assert.strictEqual(ast.refs[0].name, 'inputRef');
+  assert.strictEqual(ast.refs[0].type, null);
+  assert.strictEqual(ast.refs[0].initialValue, null);
+});
+
+test('parses #refName::Type with type annotation', () => {
+  const tokens = tokenize('#inputRef::HTMLInputElement');
+  const ast = parse(tokens);
+
+  assert.strictEqual(ast.refs.length, 1);
+  assert.strictEqual(ast.refs[0].name, 'inputRef');
+  assert.strictEqual(ast.refs[0].type.type, 'SimpleType');
+  assert.strictEqual(ast.refs[0].type.name, 'HTMLInputElement');
+});
+
+test('parses #refName = initialValue with initial value', () => {
+  const tokens = tokenize('#count = 0');
+  const ast = parse(tokens);
+
+  assert.strictEqual(ast.refs.length, 1);
+  assert.strictEqual(ast.refs[0].name, 'count');
+  assert.strictEqual(ast.refs[0].initialValue.type, 'Literal');
+  assert.strictEqual(ast.refs[0].initialValue.value, 0);
+});
+
 // Callback tokenization
 test('tokenizes ^ as CALLBACK token', () => {
   const tokens = tokenize('^handler');
@@ -179,6 +219,35 @@ test('generates useTransition hook with proper naming', () => {
   assert.ok(code.includes('useTransition'), 'should import useTransition');
   assert.ok(code.includes('isPendingSubmit'), 'should generate isPending flag with capitalized name');
   assert.ok(code.includes('startSubmitTransition'), 'should generate startTransition function with naming convention');
+});
+
+// Code generation for useRef
+test('generates useRef hook for ref declarations', () => {
+  const code = compile(`
+#inputRef
+<div>content</div>
+`);
+
+  assert.ok(code.includes('useRef'), 'should import useRef');
+  assert.ok(code.includes('const inputRef = useRef(null)'), 'should generate useRef call with null default');
+});
+
+test('generates useRef with type annotation', () => {
+  const code = compile(`
+#inputRef::HTMLInputElement
+<div>content</div>
+`);
+
+  assert.ok(code.includes('useRef<HTMLInputElement>(null)'), 'should generate typed useRef');
+});
+
+test('generates useRef with initial value', () => {
+  const code = compile(`
+#count = 0
+<div>content</div>
+`);
+
+  assert.ok(code.includes('const count = useRef(0)'), 'should generate useRef with initial value');
 });
 
 // Summary
