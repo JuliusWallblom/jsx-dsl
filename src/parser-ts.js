@@ -5,6 +5,7 @@ const MODIFIER_TRANSITION = 'transition';
 const MODIFIER_DEFERRED = 'deferred';
 const MODIFIER_OPTIMISTIC = 'optimistic';
 const MODIFIER_SYNC = 'sync';
+const MODIFIER_ACTION = 'action';
 
 export function parse(tokens) {
   let position = 0;
@@ -17,6 +18,7 @@ export function parse(tokens) {
     deferredValues: [],
     optimistics: [],
     syncs: [],
+    actionStates: [],
     contexts: [],
     callbacks: [],
     refs: [],
@@ -171,6 +173,16 @@ export function parse(tokens) {
       return;
     }
 
+    // Check for :action modifier
+    if (peek()?.type === TOKEN_TYPES.PROP && peek(1)?.type === TOKEN_TYPES.IDENTIFIER && peek(1)?.value === MODIFIER_ACTION) {
+      advance(); // consume :
+      advance(); // consume 'action'
+      consume(TOKEN_TYPES.ASSIGN);
+      const actionValue = parseActionValue();
+      ast.actionStates.push({ name, ...actionValue });
+      return;
+    }
+
     const typeAnnotation = parseTypeAnnotation();
     consume(TOKEN_TYPES.ASSIGN);
     const value = parseExpression();
@@ -200,6 +212,16 @@ export function parse(tokens) {
     }
     consume(TOKEN_TYPES.RBRACE);
     return { subscribe, getSnapshot, getServerSnapshot };
+  };
+
+  // Parse action value: {actionFn, initialState}
+  const parseActionValue = () => {
+    consume(TOKEN_TYPES.LBRACE);
+    const actionFn = parseExpression();
+    consume(TOKEN_TYPES.COMMA);
+    const initialState = parseExpression();
+    consume(TOKEN_TYPES.RBRACE);
+    return { actionFn, initialState };
   };
 
   // Parse reducer value: {initialValue, {actions}} or just initialValue

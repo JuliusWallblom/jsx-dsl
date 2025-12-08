@@ -422,6 +422,29 @@ test('generates useSyncExternalStore hook for sync declarations', () => {
   assert.ok(code.includes('const storeValue = useSyncExternalStore(subscribe, getSnapshot)'), 'should generate useSyncExternalStore call');
 });
 
+// Action modifier parsing
+test('parses @name:action = {actionFn, initialState} as action declaration', () => {
+  const tokens = tokenize('@formState:action = {submitForm, 0}');
+  const ast = parse(tokens);
+
+  assert.strictEqual(ast.actionStates.length, 1);
+  assert.strictEqual(ast.actionStates[0].name, 'formState');
+  assert.strictEqual(ast.actionStates[0].actionFn.type, 'Identifier');
+  assert.strictEqual(ast.actionStates[0].actionFn.name, 'submitForm');
+  assert.strictEqual(ast.actionStates[0].initialState.type, 'Literal');
+});
+
+// Code generation for useActionState
+test('generates useActionState hook for action declarations', () => {
+  const code = compile(`
+@formState:action = {submitForm, 0}
+<div>content</div>
+`);
+
+  assert.ok(code.includes('useActionState'), 'should import useActionState');
+  assert.ok(code.includes('const [formState, formStateAction, isPendingFormState] = useActionState(submitForm, 0)'), 'should generate useActionState call');
+});
+
 // Summary
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);
