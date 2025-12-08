@@ -1,6 +1,6 @@
 # Vite Plugin for JSX DSL
 
-The official Vite plugin for JSX DSL enables seamless integration of `.jsx.dsl` files in your React projects with zero configuration.
+The official Vite plugin for JSX DSL enables seamless integration of `.jsx.dsl` and `.tsx.dsl` files in your React projects with zero configuration.
 
 ## Installation
 
@@ -36,6 +36,12 @@ Create `src/jsx-dsl.d.ts`:
 
 ```typescript
 declare module '*.jsx.dsl' {
+  import { FC } from 'react';
+  const Component: FC<any>;
+  export default Component;
+}
+
+declare module '*.tsx.dsl' {
   import { FC } from 'react';
   const Component: FC<any>;
   export default Component;
@@ -83,7 +89,8 @@ export default App;
 ```js
 // vite.config.js
 jsxDsl({
-  // Generate TypeScript output (default: true)
+  // Generate TypeScript output for .jsx.dsl files (default: true)
+  // Note: .tsx.dsl files always generate TypeScript regardless of this option
   typescript: true,
 
   // Generate source maps (default: true)
@@ -92,8 +99,8 @@ jsxDsl({
   // Enable hot module replacement (default: true)
   hmr: true,
 
-  // Include pattern (default: /\.jsx\.dsl$/)
-  include: /\.jsx\.dsl$/,
+  // Include pattern (default: /\.(jsx|tsx)\.dsl$/)
+  include: /\.(jsx|tsx)\.dsl$/,
 
   // Exclude pattern (optional)
   exclude: /node_modules/
@@ -103,16 +110,16 @@ jsxDsl({
 ## Features
 
 ### ✨ Zero Configuration
-Just add the plugin and start using `.jsx.dsl` files. No additional setup required.
+Just add the plugin and start using `.jsx.dsl` or `.tsx.dsl` files. No additional setup required.
 
 ### 🔥 Hot Module Replacement
-Changes to `.jsx.dsl` files trigger instant updates without losing component state.
+Changes to `.jsx.dsl` and `.tsx.dsl` files trigger instant updates without losing component state.
 
 ### 🎯 TypeScript Support
-Automatic TypeScript generation with proper type inference and interfaces.
+Automatic TypeScript generation with proper type inference and interfaces. Use `.tsx.dsl` files for guaranteed TypeScript output.
 
 ### 🗺️ Source Maps
-Debug your original `.jsx.dsl` code directly in browser devtools.
+Debug your original `.jsx.dsl` or `.tsx.dsl` code directly in browser devtools.
 
 ### ⚡ Fast Compilation
 Optimized compilation process with caching for development speed.
@@ -217,7 +224,9 @@ The plugin automatically generates component names from file names:
 
 ```
 counter.jsx.dsl        → Counter
+counter.tsx.dsl        → Counter
 user-profile.jsx.dsl   → UserProfile
+user-profile.tsx.dsl   → UserProfile
 my_component.jsx.dsl   → MyComponent
 ```
 
@@ -242,7 +251,7 @@ my_component.jsx.dsl   → MyComponent
 Error: Cannot resolve module './Component.jsx.dsl'
 ```
 
-**Solution**: Ensure the plugin is added to your Vite config and the file has the correct `.jsx.dsl` extension.
+**Solution**: Ensure the plugin is added to your Vite config and the file has the correct `.jsx.dsl` or `.tsx.dsl` extension.
 
 #### 2. TypeScript errors
 ```
@@ -253,7 +262,7 @@ Cannot find module './Component.jsx.dsl' or its corresponding type declarations
 
 #### 3. HMR not working
 ```
-Changes to .jsx.dsl files don't trigger updates
+Changes to .jsx.dsl or .tsx.dsl files don't trigger updates
 ```
 
 **Solution**: Ensure `hmr: true` in plugin options and restart the dev server.

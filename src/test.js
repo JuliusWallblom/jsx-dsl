@@ -445,6 +445,101 @@ test('generates useActionState hook for action declarations', () => {
   assert.ok(code.includes('const [formState, formStateAction, isPendingFormState] = useActionState(submitForm, 0)'), 'should generate useActionState call');
 });
 
+// File extension detection tests
+import { getFileInfo } from './cli.js';
+
+test('detects .tsx.dsl as TypeScript file', () => {
+  const info = getFileInfo('component.tsx.dsl');
+  assert.strictEqual(info.isTypeScript, true);
+  assert.strictEqual(info.componentName, 'Component');
+  assert.strictEqual(info.extension, '.tsx.dsl');
+});
+
+test('detects .jsx.dsl as JavaScript file', () => {
+  const info = getFileInfo('component.jsx.dsl');
+  assert.strictEqual(info.isTypeScript, false);
+  assert.strictEqual(info.componentName, 'Component');
+  assert.strictEqual(info.extension, '.jsx.dsl');
+});
+
+test('derives component name from .tsx.dsl file with kebab-case', () => {
+  const info = getFileInfo('my-component.tsx.dsl');
+  assert.strictEqual(info.componentName, 'MyComponent');
+});
+
+test('derives default output path from .tsx.dsl file', () => {
+  const info = getFileInfo('/path/to/my-component.tsx.dsl');
+  assert.strictEqual(info.defaultOutput, '/path/to/my-component.tsx');
+});
+
+test('derives default output path from .jsx.dsl file', () => {
+  const info = getFileInfo('/path/to/my-component.jsx.dsl');
+  assert.strictEqual(info.defaultOutput, '/path/to/my-component.jsx');
+});
+
+// Vite plugin file detection tests
+import { isDslFile, getOutputExtension } from '../vite-plugin-jsx-dsl.js';
+
+test('isDslFile returns true for .jsx.dsl files', () => {
+  assert.strictEqual(isDslFile('component.jsx.dsl'), true);
+  assert.strictEqual(isDslFile('/path/to/component.jsx.dsl'), true);
+});
+
+test('isDslFile returns true for .tsx.dsl files', () => {
+  assert.strictEqual(isDslFile('component.tsx.dsl'), true);
+  assert.strictEqual(isDslFile('/path/to/component.tsx.dsl'), true);
+});
+
+test('isDslFile returns false for non-DSL files', () => {
+  assert.strictEqual(isDslFile('component.tsx'), false);
+  assert.strictEqual(isDslFile('component.jsx'), false);
+  assert.strictEqual(isDslFile('component.js'), false);
+});
+
+test('getOutputExtension returns .tsx for .tsx.dsl files', () => {
+  assert.strictEqual(getOutputExtension('component.tsx.dsl'), '.tsx');
+});
+
+test('getOutputExtension returns .tsx for .jsx.dsl files with typescript option', () => {
+  assert.strictEqual(getOutputExtension('component.jsx.dsl', true), '.tsx');
+});
+
+test('getOutputExtension returns .jsx for .jsx.dsl files without typescript option', () => {
+  assert.strictEqual(getOutputExtension('component.jsx.dsl', false), '.jsx');
+});
+
+// Webpack loader file detection tests
+import { getLoaderFileInfo } from '../jsx-dsl-loader.mjs';
+
+test('getLoaderFileInfo detects .tsx.dsl as TypeScript file', () => {
+  const info = getLoaderFileInfo('/path/to/component.tsx.dsl');
+  assert.strictEqual(info.isTypeScript, true);
+  assert.strictEqual(info.componentName, 'Component');
+});
+
+test('getLoaderFileInfo detects .jsx.dsl as JavaScript file', () => {
+  const info = getLoaderFileInfo('/path/to/component.jsx.dsl');
+  assert.strictEqual(info.isTypeScript, false);
+  assert.strictEqual(info.componentName, 'Component');
+});
+
+test('getLoaderFileInfo derives component name with kebab-case', () => {
+  const info = getLoaderFileInfo('/path/to/my-counter.tsx.dsl');
+  assert.strictEqual(info.componentName, 'MyCounter');
+});
+
+// Edge case tests
+test('getFileInfo handles non-DSL files gracefully', () => {
+  const info = getFileInfo('component.tsx');
+  assert.strictEqual(info.extension, null);
+  assert.strictEqual(info.isTypeScript, false);
+});
+
+test('isDslFile handles paths with query strings', () => {
+  assert.strictEqual(isDslFile('component.tsx.dsl?v=123'), true);
+  assert.strictEqual(isDslFile('component.jsx.dsl?import'), true);
+});
+
 // Summary
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);

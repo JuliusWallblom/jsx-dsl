@@ -13,6 +13,35 @@ import { generateTypeScript } from './generator-ts.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+/**
+ * Get file information from a DSL file path including extension detection,
+ * component name derivation, and default output path.
+ */
+export function getFileInfo(filePath) {
+  const isTsxDsl = filePath.endsWith('.tsx.dsl');
+  const isJsxDsl = filePath.endsWith('.jsx.dsl');
+  const extension = isTsxDsl ? '.tsx.dsl' : isJsxDsl ? '.jsx.dsl' : null;
+
+  // Derive component name from file basename
+  const baseName = extension ? basename(filePath, extension) : basename(filePath);
+  const componentName = baseName
+    .replace(/^\w/, c => c.toUpperCase())
+    .replace(/-(\w)/g, (_, c) => c.toUpperCase());
+
+  // Derive default output path
+  const outputExtension = isTsxDsl ? '.tsx' : '.jsx';
+  const defaultOutput = extension
+    ? filePath.replace(new RegExp(`\\${extension}$`), outputExtension)
+    : filePath;
+
+  return {
+    isTypeScript: isTsxDsl,
+    componentName,
+    extension,
+    defaultOutput
+  };
+}
+
 function compile(inputFile, options) {
   try {
     // Read input file
@@ -27,16 +56,15 @@ function compile(inputFile, options) {
     console.log(chalk.yellow('🌳 Parsing...'));
     const ast = parse(tokens);
 
-    // Generate code based on output type
-    const isTypeScript = options.typescript || options.output?.endsWith('.tsx');
-    const componentName = basename(inputFile, '.jsx.dsl')
-      .replace(/^\w/, c => c.toUpperCase())
-      .replace(/-(\w)/g, (_, c) => c.toUpperCase());
+    // Get file information and detect TypeScript mode
+    const fileInfo = getFileInfo(inputFile);
+    const isTypeScript = options.typescript || fileInfo.isTypeScript || options.output?.endsWith('.tsx');
+    const componentName = fileInfo.componentName;
 
     if (isTypeScript) {
       console.log(chalk.yellow('⚛️  Generating TypeScript React code...'));
 
-      const outputFile = options.output || inputFile.replace(/\.rdsl$/, '.tsx');
+      const outputFile = options.output || fileInfo.defaultOutput;
       const { code, map } = generateTypeScript(ast, inputFile, {
         outputFile,
         componentName,
@@ -66,7 +94,7 @@ function compile(inputFile, options) {
     } else {
       console.log(chalk.yellow('⚛️  Generating React code...'));
 
-      const outputFile = options.output || inputFile.replace(/\.jsx\.dsl$/, '.jsx').replace(/(?<!\.jsx)$/, '.jsx');
+      const outputFile = options.output || fileInfo.defaultOutput;
       const reactCode = generate(ast);
 
       console.log(chalk.blue(`✍️  Writing to ${outputFile}...`));
@@ -120,7 +148,7 @@ program
   .name('jsx-dsl')
   .description('Fast DSL Compiler with TypeScript and Source Map support')
   .version('2.0.0')
-  .argument('<input>', 'Input DSL file (.jsx.dsl)')
+  .argument('<input>', 'Input DSL file (.jsx.dsl or .tsx.dsl)')
   .option('-o, --output <file>', 'Output file path')
   .option('-t, --typescript', 'Generate TypeScript (.tsx) output')
   .option('-s, --sourcemap', 'Generate source maps')
@@ -130,13 +158,6 @@ program
   .option('--debug', 'Show debug information and stack traces')
   .action(async (inputFile, options) => {
     const input = resolve(inputFile);
-
-    // Set default output based on options
-    if (!options.output) {
-      if (options.typescript) {
-        options.output = input.replace(/\.jsx\.dsl$/, '.tsx');
-      }
-    }
 
     if (options.watch) {
       await watch(input, options);
@@ -186,4 +207,7 @@ program
 `));
   });
 
-program.parse();
+// Only parse CLI args when running as main module
+if (import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith('/cli.js')) {
+  program.parse();
+}

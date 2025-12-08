@@ -1,4 +1,4 @@
-// Vite plugin for JSX DSL (.jsx.dsl files)
+// Vite plugin for JSX DSL (.jsx.dsl and .tsx.dsl files)
 import path from 'path';
 import { transform as esbuildTransform } from 'esbuild';
 import { tokenize } from './src/tokenizer-ts.js';
@@ -6,16 +6,49 @@ import { parse } from './src/parser-ts.js';
 import { generateTypeScript } from './src/generator-ts.js';
 import { generate } from './src/generator.js';
 
-const JSX_DSL_FILE_REGEX = /\.jsx\.dsl$/;
+const DSL_FILE_REGEX = /\.(jsx|tsx)\.dsl($|\?)/;
+
+/**
+ * Check if a file path is a DSL file (.jsx.dsl or .tsx.dsl)
+ */
+export function isDslFile(filePath) {
+  return DSL_FILE_REGEX.test(filePath);
+}
+
+/**
+ * Determine if a file should be compiled as TypeScript based on extension
+ */
+export function isTsxDslFile(filePath) {
+  return filePath.endsWith('.tsx.dsl');
+}
+
+/**
+ * Get the appropriate output extension based on file type and options
+ */
+export function getOutputExtension(filePath, useTypescript) {
+  if (filePath.endsWith('.tsx.dsl')) {
+    return '.tsx';
+  }
+  return useTypescript ? '.tsx' : '.jsx';
+}
+
+/**
+ * Get the DSL extension from a file path
+ */
+export function getDslExtension(filePath) {
+  if (filePath.endsWith('.tsx.dsl')) return '.tsx.dsl';
+  if (filePath.endsWith('.jsx.dsl')) return '.jsx.dsl';
+  return null;
+}
 
 /**
  * Vite plugin for JSX DSL
  * @param {Object} options - Plugin options
- * @param {boolean} options.typescript - Generate TypeScript output (default: true)
+ * @param {boolean} options.typescript - Generate TypeScript output for .jsx.dsl files (default: true). Note: .tsx.dsl files always generate TypeScript.
  * @param {boolean} options.sourceMap - Generate source maps (default: true)
  * @param {boolean} options.hmr - Enable hot module replacement (default: true)
- * @param {string} options.include - Include pattern (default: /\.jsx\.dsl$/)
- * @param {string} options.exclude - Exclude pattern
+ * @param {RegExp} options.include - Include pattern (default: /\.(jsx|tsx)\.dsl$/)
+ * @param {RegExp} options.exclude - Exclude pattern
  * @returns {import('vite').Plugin} Vite plugin
  */
 export default function jsxDslPlugin(options = {}) {
@@ -23,7 +56,7 @@ export default function jsxDslPlugin(options = {}) {
     typescript = true,
     sourceMap = true,
     hmr = true,
-    include = JSX_DSL_FILE_REGEX,
+    include = DSL_FILE_REGEX,
     exclude
   } = options;
 
@@ -37,29 +70,34 @@ export default function jsxDslPlugin(options = {}) {
       isProduction = config.command === 'build';
     },
 
-    // Handle .jsx.dsl file resolution
+    // Handle .jsx.dsl and .tsx.dsl file resolution
     resolveId(id, importer) {
-      if (JSX_DSL_FILE_REGEX.test(id)) {
+      if (isDslFile(id)) {
         return path.resolve(path.dirname(importer || ''), id);
       }
     },
 
-    // Transform .jsx.dsl files
+    // Transform .jsx.dsl and .tsx.dsl files
     async transform(code, id) {
-      // Check if this is a .jsx.dsl file
-      if (!JSX_DSL_FILE_REGEX.test(id)) return;
+      // Check if this is a DSL file
+      if (!isDslFile(id)) return;
 
       // Apply include/exclude filters
       if (include && !include.test(id)) return;
       if (exclude && exclude.test(id)) return;
 
       try {
-        // Parse the .jsx.dsl file
+        // Parse the DSL file
         const tokens = tokenize(code);
         const ast = parse(tokens);
 
+        // Detect TypeScript mode: .tsx.dsl always uses TypeScript, .jsx.dsl uses the typescript option
+        const useTypeScript = isTsxDslFile(id) || typescript;
+        const dslExtension = getDslExtension(id);
+        const outputExtension = getOutputExtension(id, typescript);
+
         // Generate the component name from file path
-        const componentName = path.basename(id, '.jsx.dsl')
+        const componentName = path.basename(id, dslExtension)
           .replace(/^\w/, c => c.toUpperCase())
           .replace(/-(\w)/g, (_, c) => c.toUpperCase())
           .replace(/[^a-zA-Z0-9]/g, '');
@@ -67,12 +105,12 @@ export default function jsxDslPlugin(options = {}) {
         let output;
         let map = null;
 
-        if (typescript) {
+        if (useTypeScript) {
           // Generate TypeScript
           const result = generateTypeScript(ast, id, {
             componentName,
             generateSourceMap: sourceMap,
-            outputFile: id.replace('.jsx.dsl', '.tsx')
+            outputFile: id.replace(dslExtension, outputExtension)
           });
           output = result.code;
           map = result.map;
@@ -97,7 +135,7 @@ if (import.meta.hot) {
         // IMPORTANT: Transform the JSX/TSX to JS using esbuild
         // Since we generated TSX/JSX code, we need to transform it to JS
         const transformed = await esbuildTransform(output, {
-          loader: typescript ? 'tsx' : 'jsx',
+          loader: useTypeScript ? 'tsx' : 'jsx',
           target: 'esnext',
           jsx: 'automatic',
           jsxDev: !isProduction,
@@ -120,11 +158,11 @@ if (import.meta.hot) {
 
     // Handle HMR updates
     handleHotUpdate(ctx) {
-      if (JSX_DSL_FILE_REGEX.test(ctx.file)) {
-        // Force update all modules that import this .jsx.dsl file
+      if (isDslFile(ctx.file)) {
+        // Force update all modules that import this DSL file
         const affectedModules = new Set();
 
-        // Find all modules that import this .jsx.dsl file
+        // Find all modules that import this DSL file
         for (const mod of ctx.server.moduleGraph.getModulesByFile(ctx.file) || []) {
           affectedModules.add(mod);
 
@@ -140,10 +178,10 @@ if (import.meta.hot) {
 
     // Configure dev server
     configureServer(server) {
-      // Middleware to handle .jsx.dsl file requests
+      // Middleware to handle DSL file requests
       server.middlewares.use((req, res, next) => {
-        if (req.url && JSX_DSL_FILE_REGEX.test(req.url)) {
-          // Set appropriate headers for .jsx.dsl files
+        if (req.url && isDslFile(req.url)) {
+          // Set appropriate headers for DSL files
           res.setHeader('Content-Type', 'application/javascript');
         }
         next();
@@ -153,15 +191,15 @@ if (import.meta.hot) {
     // Build hooks
     buildStart() {
       // Log that the plugin is active
-      this.info('JSX DSL plugin active - compiling .jsx.dsl files');
+      this.info('JSX DSL plugin active - compiling .jsx.dsl and .tsx.dsl files');
     },
 
     // Generate bundle
     generateBundle(options, bundle) {
       // Post-process generated files if needed
       for (const [fileName, chunk] of Object.entries(bundle)) {
-        if (chunk.type === 'chunk' && chunk.facadeModuleId?.endsWith('.jsx.dsl')) {
-          // Add metadata about the original .jsx.dsl file
+        if (chunk.type === 'chunk' && isDslFile(chunk.facadeModuleId || '')) {
+          // Add metadata about the original DSL file
           chunk.jsxDslOriginal = chunk.facadeModuleId;
         }
       }

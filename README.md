@@ -2,7 +2,7 @@
 
 An ultra-minimal DSL that compiles to React code with state, effects, memoization, and more. Now with **TypeScript support**, **source maps**, and **VSCode integration**!
 
-**File extension: `.jsx.dsl`**
+**File extensions: `.jsx.dsl` (JavaScript) or `.tsx.dsl` (TypeScript)**
 
 ## Installation
 
@@ -28,10 +28,13 @@ npm install
 ### CLI
 
 ```bash
-# Compile to JavaScript
+# Compile .jsx.dsl to JavaScript
 jsx-dsl input.jsx.dsl
 
-# Compile to TypeScript with source maps
+# Compile .tsx.dsl to TypeScript (automatic, no flag needed)
+jsx-dsl input.tsx.dsl
+
+# Compile .jsx.dsl to TypeScript (using flag)
 jsx-dsl input.jsx.dsl --typescript --sourcemap
 
 # Watch mode with auto-recompilation
@@ -44,10 +47,12 @@ jsx-dsl input.jsx.dsl --stats
 jsx-dsl examples
 ```
 
+**Note:** Files with the `.tsx.dsl` extension automatically compile to TypeScript without needing the `--typescript` flag.
+
 ### VSCode Extension
 
 1. Install the extension: `code --install-extension vscode-extension/jsx-dsl-0.1.0.vsix`
-2. Open any `.jsx.dsl` file
+2. Open any `.jsx.dsl` or `.tsx.dsl` file
 3. Enjoy syntax highlighting, auto-complete, and snippets
 4. Press `Cmd+Shift+R` (Mac) or `Ctrl+Shift+R` (Windows/Linux) to compile
 
